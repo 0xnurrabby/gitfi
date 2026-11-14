@@ -179,6 +179,7 @@ CREATE TABLE IF NOT EXISTS tokens (
   ticker TEXT NOT NULL,
   description TEXT,
   logo_url TEXT NOT NULL,
+  logo_ipfs_url TEXT,
   metadata_json TEXT NOT NULL DEFAULT '{}',
   website TEXT,
   twitter TEXT,
@@ -463,6 +464,11 @@ INSERT OR IGNORE INTO platform_config(key, value) VALUES ('feeds_started', strft
 
 export function initDb(): void {
   db.exec(schema);
+  try {
+    db.exec("ALTER TABLE tokens ADD COLUMN logo_ipfs_url TEXT");
+  } catch {
+    // Column already exists on this database.
+  }
 }
 
 export function withTransaction<T>(fn: () => T): T {

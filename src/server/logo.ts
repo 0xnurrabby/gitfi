@@ -2,16 +2,44 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import sharp from "sharp";
+import { config } from "./config.js";
 import { uploadDir } from "./db.js";
 
 export interface SavedLogo {
   logoUrl: string;
   metadataImage: string;
+  ipfsUrl: string | null;
   hash: string;
 }
 
 function hashBuffer(buffer: Buffer): string {
   return crypto.createHash("sha256").update(buffer).digest("hex").slice(0, 24);
+}
+
+async function pinToPinata(buffer: Buffer, filename: string): Promise<string | null> {
+  if (!config.pinataJwt) return null;
+  try {
+    const form = new FormData();
+    form.append("file", new Blob([buffer], { type: "image/webp" }), filename);
+    form.append("network", "public");
+    const response = await fetch("https://uploads.pinata.cloud/v3/files", {
+      method: "POST",
+      headers: { authorization: `Bearer ${config.pinataJwt}` },
+      body: form,
+      signal: AbortSignal.timeout(20_000),
+    });
+    if (!response.ok) return null;
+    const payload = (await response.json()) as {
+      data?: { cid?: string };
+      cid?: string;
+      IpfsHash?: string;
+    };
+    const cid = payload.data?.cid ?? payload.cid ?? payload.IpfsHash;
+    if (!cid) return null;
+    return `${config.pinataGateway.replace(/\/$/, "")}/${cid}`;
+  } catch {
+    return null;
+  }
 }
 
 export async function saveLogoDataUrl(dataUrl: string): Promise<SavedLogo> {
@@ -42,9 +70,11 @@ export async function saveLogoDataUrl(dataUrl: string): Promise<SavedLogo> {
     .toBuffer();
   fs.writeFileSync(path.join(uploadDir, `${hash}-128.webp`), thumb);
   const logoUrl = `data:image/webp;base64,${buffer.toString("base64")}`;
+  const ipfsUrl = await pinToPinata(buffer, filename);
   return {
     logoUrl,
-    metadataImage: logoUrl,
+    metadataImage: ipfsUrl ?? logoUrl,
+    ipfsUrl,
     hash,
   };
 }
@@ -98,9 +128,11 @@ export async function generateLogo(
   const thumb = await sharp(buffer).resize(128, 128).webp({ quality: 80 }).toBuffer();
   fs.writeFileSync(path.join(uploadDir, `${hash}-128.webp`), thumb);
   const logoUrl = `data:image/webp;base64,${buffer.toString("base64")}`;
+  const ipfsUrl = await pinToPinata(buffer, filename);
   return {
     logoUrl,
-    metadataImage: logoUrl,
+    metadataImage: ipfsUrl ?? logoUrl,
+    ipfsUrl,
     hash,
   };
 }

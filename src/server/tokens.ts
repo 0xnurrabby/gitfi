@@ -71,6 +71,7 @@ export interface TokenRow {
   ticker: string;
   description: string | null;
   logo_url: string;
+  logo_ipfs_url: string | null;
   metadata_json: string;
   website: string | null;
   twitter: string | null;

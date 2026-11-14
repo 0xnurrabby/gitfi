@@ -78,6 +78,8 @@ export const config = {
       return "gitfi.fun";
     }
   })(),
+  pinataJwt: process.env.PINATA_JWT ?? "",
+  pinataGateway: process.env.PINATA_GATEWAY ?? "https://gateway.pinata.cloud/ipfs",
   seedDemo: process.env.SEED_DEMO !== "false",
   demoMode: process.env.DEMO_MODE !== "false",
   platformYieldShareBps: Number(process.env.PLATFORM_YIELD_SHARE_BPS ?? 4000),

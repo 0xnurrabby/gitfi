@@ -516,7 +516,7 @@ export function buildNftMetadata(input: {
   tier: string;
 }): Record<string, unknown> {
   const base = config.appUrl.replace(/\/$/, "");
-  const image = input.logoUrl.startsWith("data:")
+  const image = /^(data:|https?:)/.test(input.logoUrl)
     ? input.logoUrl
     : `${base}${input.logoUrl}`;
   return {

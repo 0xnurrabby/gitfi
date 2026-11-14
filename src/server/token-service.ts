@@ -146,6 +146,7 @@ export async function launchToken(user: UserRow, input: LaunchInput): Promise<La
   const vip = tokenConfigForTier(tier).vipThresholdMicro;
   const appBase = config.appUrl.replace(/\/$/, "");
   const logoSrc = logo.logoUrl.startsWith("data:") ? logo.logoUrl : `${appBase}${logo.logoUrl}`;
+  const metadataImage = logo.metadataImage || logoSrc;
   const metadata = {
     spec: "ft-1.0.0",
     schema: "gitfi-token/1.0",
@@ -153,8 +154,8 @@ export async function launchToken(user: UserRow, input: LaunchInput): Promise<La
     symbol: input.ticker,
     ticker: input.ticker,
     description: input.description.trim(),
-    icon: logoSrc,
-    image: logoSrc,
+    icon: metadataImage,
+    image: metadataImage,
     reference: `${appBase}/token/${slug}`,
     repo: repo.full_name,
     website,
@@ -199,7 +200,7 @@ export async function launchToken(user: UserRow, input: LaunchInput): Promise<La
     repoDescription: repo.description,
     tokenName: input.name.trim(),
     ticker: input.ticker,
-    logoUrl: logo.logoUrl,
+    logoUrl: logo.metadataImage,
     owner: user.address,
     stars: repo.stars,
     tier,
@@ -221,11 +222,11 @@ export async function launchToken(user: UserRow, input: LaunchInput): Promise<La
     recordLaunchPayment(payment, user.address);
     db.prepare(
       `INSERT INTO tokens(
-        id, repo_id, slug, name, ticker, description, logo_url, metadata_json, website, twitter,
+        id, repo_id, slug, name, ticker, description, logo_url, logo_ipfs_url, metadata_json, website, twitter,
         owner_wallet, creator_wallet, verification, status, tier, target_market_cap_micro,
         total_supply_micro, curve_supply_micro, milestone_reserve_micro, last_price_micro,
         vip_threshold_micro, launch_at, launched_at, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     ).run(
       tokenId,
       repo.id,
@@ -234,6 +235,7 @@ export async function launchToken(user: UserRow, input: LaunchInput): Promise<La
       input.ticker,
       input.description.trim(),
       logo.logoUrl,
+      logo.ipfsUrl,
       JSON.stringify(metadata),
       website,
       twitter,
@@ -373,19 +375,20 @@ export async function updateTokenLogo(
     })();
     const appBase = config.appUrl.replace(/\/$/, "");
     const logoSrc = logo.logoUrl.startsWith("data:") ? logo.logoUrl : `${appBase}${logo.logoUrl}`;
-    meta.image = logoSrc;
-    meta.icon = logoSrc;
+    const metadataImage = logo.metadataImage || logoSrc;
+    meta.image = metadataImage;
+    meta.icon = metadataImage;
     db.prepare(
-      "UPDATE tokens SET logo_url = ?, metadata_json = ?, updated_at = ? WHERE id = ?",
-    ).run(logo.logoUrl, JSON.stringify(meta), now, token.id);
+      "UPDATE tokens SET logo_url = ?, logo_ipfs_url = ?, metadata_json = ?, updated_at = ? WHERE id = ?",
+    ).run(logo.logoUrl, logo.ipfsUrl, JSON.stringify(meta), now, token.id);
     const nft = db
       .prepare("SELECT metadata_json FROM repo_nfts WHERE repo_id = ?")
       .get(token.repo_id) as { metadata_json: string } | undefined;
     if (nft) {
       try {
         const nftMeta = JSON.parse(nft.metadata_json) as Record<string, unknown>;
-        nftMeta.image = logoSrc;
-        nftMeta.media = logoSrc;
+        nftMeta.image = metadataImage;
+        nftMeta.media = metadataImage;
         db.prepare("UPDATE repo_nfts SET metadata_json = ?, updated_at = ? WHERE repo_id = ?").run(
           JSON.stringify(nftMeta),
           now,
@@ -398,7 +401,7 @@ export async function updateTokenLogo(
     appendReceipt("token.logo.update", token.id, {
       tokenId: token.id,
       wallet: user.address,
-      logoUrl: logo.logoUrl,
+      logoUrl: logo.metadataImage,
     });
     db.prepare(
       `INSERT INTO activities(id, token_id, type, actor_wallet, message, metadata_json, created_at)
@@ -434,8 +437,8 @@ export function tokenMetadata(tokenId: string): Record<string, unknown> | null {
     symbol: token.ticker,
     ticker: token.ticker,
     description: token.description,
-    icon: `${config.appUrl.replace(/\/$/, "")}${token.logo_url}`,
-    image: `${config.appUrl.replace(/\/$/, "")}${token.logo_url}`,
+    icon: token.logo_ipfs_url || (token.logo_url.startsWith("data:") ? token.logo_url : `${config.appUrl.replace(/\/$/, "")}${token.logo_url}`),
+    image: token.logo_ipfs_url || (token.logo_url.startsWith("data:") ? token.logo_url : `${config.appUrl.replace(/\/$/, "")}${token.logo_url}`),
     reference: `${config.appUrl.replace(/\/$/, "")}/token/${token.slug}`,
     external_url: `${config.appUrl.replace(/\/$/, "")}/token/${token.slug}`,
     repo: repo.full_name,
