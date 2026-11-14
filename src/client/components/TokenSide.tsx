@@ -282,7 +282,7 @@ export function NftCard({ token }: { token: TokenDetail }) {
   return (
     <Card className="nft-card">
       <div className="side-card-head">
-        <span className="eyebrow"><FileJson size={12} /> Repo deed</span>
+        <span className="eyebrow"><FileJson size={12} /> Repo deed NFT</span>
         <span className="mono side-badge">{token.nft.status.toUpperCase()}</span>
       </div>
       <div className="nft-visual">
@@ -290,7 +290,7 @@ export function NftCard({ token }: { token: TokenDetail }) {
         <div>
           <span className="mono nft-label">GITFI REPO NFT</span>
           <strong>{token.repo.fullName}</strong>
-          <span className="mono nft-id">{token.nft.id.slice(0, 18)}…</span>
+          <span className="mono nft-id">{token.id}</span>
         </div>
         <div className="nft-seal"><BadgeCheck size={17} /></div>
       </div>
@@ -325,15 +325,15 @@ export function NftCard({ token }: { token: TokenDetail }) {
           <>
             <BadgeCheck size={12} />
             <span>
-              Repo Deed minted on NEAR {token.nft.chainStatus === "confirmed" ? "testnet" : "testnet (pending)"}.
-              Only one deed can exist for this repository.
+              Repo Deed NFT minted on NEAR {token.nft.chainStatus === "confirmed" ? "testnet" : "testnet (pending)"}.
+              Bound to verified repository ownership; only one deed can exist per repo.
             </span>
           </>
         ) : (
           <>
             <BadgeCheck size={12} />
             <span>
-              Oracle-signed deed recorded locally. The Repo Deed is queued for NEAR testnet and cannot be duplicated.
+              Oracle-signed deed recorded locally. The Repo Deed NFT is queued for NEAR testnet and cannot be duplicated.
             </span>
           </>
         )}

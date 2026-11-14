@@ -246,7 +246,7 @@ export function ProofPage() {
             <a className="contract-row text-link" href={chain?.contractUrl ?? platform?.contractUrl} target="_blank" rel="noreferrer">
               <Code2 size={13} /><span>{chain?.contractId ?? platform?.contractId ?? "gitfi-395012.testnet"}</span><BadgeCheck size={12} />
             </a>
-            <div className="contract-row"><Code2 size={13} /><span>repo_registry · NEP-171 deed</span><BadgeCheck size={12} /></div>
+            <div className="contract-row"><Code2 size={13} /><span>repo_registry · NEP-171-style deed</span><BadgeCheck size={12} /></div>
             <div className="contract-row"><Code2 size={13} /><span>oracle envelope · Ed25519</span><BadgeCheck size={12} /></div>
             <div className="contract-row"><Code2 size={13} /><span>receipt anchors · Borsh + nonce</span><BadgeCheck size={12} /></div>
             <p className="contracts-note">

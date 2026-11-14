@@ -24,6 +24,7 @@ import { useAuth } from "../contexts/AuthContext.js";
 import { useToast } from "../contexts/ToastContext.js";
 import { Badge, Button, Card, EmptyState, ProgressBar, Skeleton } from "../components/ui.js";
 import { AssetLogo } from "../components/AssetLogo.js";
+import { NftCard } from "../components/TokenSide.js";
 import { AiSummary } from "../components/Readme.js";
 
 const YOCTO_PER_NEAR = 10n ** 24n;
@@ -707,6 +708,8 @@ export function OnChainMarketPage() {
               <p className="onchain-note">Connect your NEAR wallet to stake and claim fee yield.</p>
             )}
           </Card>
+
+          <NftCard token={token} />
 
           <div className="onchain-below">
             <AiSummary token={token} />
