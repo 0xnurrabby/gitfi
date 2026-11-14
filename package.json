@@ -39,6 +39,7 @@
     "test:visual": "node scripts/visual-check.mjs",
     "test:smoke": "node scripts/smoke.mjs",
     "mainnet:preflight": "node scripts/mainnet-preflight.mjs",
+    "mainnet:deploy": "node scripts/mainnet-deploy.mjs",
     "verify": "npm run typecheck && npm test && npm run build"
   },
   "dependencies": {

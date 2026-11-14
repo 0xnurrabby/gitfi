@@ -37,6 +37,15 @@ npm run mainnet:preflight
 
 It prints missing environment variables, WASM code hashes, estimated code storage and current account balances.
 
+After the deployer is funded and the env is complete, run:
+
+```bash
+# Without MAINNET_CONFIRM this is a dry run and sends nothing.
+MAINNET_CONFIRM=DEPLOY npm run mainnet:deploy
+```
+
+The script creates the owner, oracle, fees, registry and market subaccounts, deploys both contracts, initializes them, and writes the owner and oracle key files under `data/`. Do not commit those files.
+
 ## Environment
 
 ```ini
