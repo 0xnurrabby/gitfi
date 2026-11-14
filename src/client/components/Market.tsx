@@ -121,8 +121,8 @@ export function MarketTable({
             <th className="col-rank">#</th>
             <th>Repository asset</th>
             <th className="col-tier">Tier</th>
-            <th className="numeric">Price</th>
-            <th className="numeric">24H</th>
+            <th className="numeric col-price">Price</th>
+            <th className="numeric col-change">24H</th>
             <th className="numeric col-fdv">FDV</th>
             <th className="numeric col-volume">24H VOL</th>
             {showProgress ? <th className="col-curve">Curve</th> : null}
@@ -166,8 +166,8 @@ export function MarketTable({
                 </div>
               </td>
               <td className="col-tier"><TierBadge tier={token.tier} short /></td>
-              <td className="numeric mono market-price">{formatPrice(token.priceMicro)}</td>
-              <td className="numeric"><Change bps={token.change24hBps} /></td>
+              <td className="numeric mono market-price col-price">{formatPrice(token.priceMicro)}</td>
+              <td className="numeric col-change"><Change bps={token.change24hBps} /></td>
               <td className="numeric mono col-fdv">{formatUsd(token.marketCapMicro, { compact: true })}</td>
               <td className="numeric mono col-volume">
                 {formatUsd(token.volume24hMicro, { compact: true })}
