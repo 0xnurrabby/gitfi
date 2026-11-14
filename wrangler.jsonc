@@ -1,0 +1,15 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "gitfi-fun",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-11-14",
+  "assets": {
+    "directory": "./dist/client",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application"
+  },
+  "vars": {
+    "API_ORIGIN": "https://gitfi-api.onrender.com",
+    "APP_ORIGIN": "https://gitfi.fun"
+  }
+}

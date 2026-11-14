@@ -12,3 +12,5 @@ data
 .DS_Store
 contracts/target
 data-test
+.wrangler
+.dev.vars

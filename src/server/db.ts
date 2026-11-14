@@ -1,4 +1,4 @@
-import { DatabaseSync } from "node:sqlite";
+import Database from "libsql";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -12,15 +12,29 @@ export const uploadDir = path.join(dataDir, "uploads");
 fs.mkdirSync(dataDir, { recursive: true });
 fs.mkdirSync(uploadDir, { recursive: true });
 
-export const db = new DatabaseSync(path.join(dataDir, "gitfi.db"));
+const tursoUrl = process.env.TURSO_DATABASE_URL?.trim();
+const tursoToken = process.env.TURSO_AUTH_TOKEN?.trim();
+export const usingTurso = Boolean(tursoUrl);
 
-db.exec(`
-  PRAGMA journal_mode = WAL;
-  PRAGMA synchronous = NORMAL;
-  PRAGMA foreign_keys = ON;
-  PRAGMA busy_timeout = 5000;
-  PRAGMA temp_store = MEMORY;
-`);
+export const db = usingTurso
+  ? new Database(
+      tursoUrl!,
+      { authToken: tursoToken } as unknown as ConstructorParameters<typeof Database>[1],
+    )
+  : new Database(path.join(dataDir, "gitfi.db"));
+
+if (usingTurso) {
+  // Remote libSQL only supports a subset of SQLite pragmas.
+  db.exec("PRAGMA foreign_keys = ON;");
+} else {
+  db.exec(`
+    PRAGMA journal_mode = WAL;
+    PRAGMA synchronous = NORMAL;
+    PRAGMA foreign_keys = ON;
+    PRAGMA busy_timeout = 5000;
+    PRAGMA temp_store = MEMORY;
+  `);
+}
 
 const schema = `
 CREATE TABLE IF NOT EXISTS meta (
