@@ -42,7 +42,7 @@ export const config = {
   openaiKey: process.env.OPENAI_API_KEY ?? "",
   openaiModel: process.env.OPENAI_MODEL ?? "gpt-4o-mini",
   nearNetwork: process.env.NEAR_NETWORK ?? "testnet",
-  nearContractId: process.env.NEAR_CONTRACT_ID ?? "gitfi-395012.testnet",
+  nearContractId: process.env.NEAR_CONTRACT_ID ?? "registry.gitfi-395012.testnet",
   nearMarketContractId:
     process.env.NEAR_MARKET_CONTRACT_ID ?? "market.gitfi-395012.testnet",
   nearRpcUrl:

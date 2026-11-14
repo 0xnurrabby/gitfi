@@ -309,8 +309,8 @@ export function SiteFooter() {
         </div>
         <div className="footer-col">
           <span className="footer-heading">Built on</span>
-          <a href={platform?.contractUrl ?? "https://explorer.testnet.near.org/accounts/gitfi-395012.testnet"} target="_blank" rel="noreferrer">
-            {platform?.contractId ?? "gitfi-395012.testnet"} <ExternalLink size={11} />
+          <a href={platform?.contractUrl ?? "https://explorer.testnet.near.org/accounts/registry.gitfi-395012.testnet"} target="_blank" rel="noreferrer">
+            {platform?.contractId ?? "registry.gitfi-395012.testnet"} <ExternalLink size={11} />
           </a>
           <span>NEAR testnet deeds</span>
           <span>On-chain NEAR market</span>
