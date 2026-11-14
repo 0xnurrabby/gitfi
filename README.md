@@ -462,4 +462,3 @@ GitFi is an experiment in making public work legible to markets without asking b
 <sub>Built for the NEAR ecosystem. Testnet build. Not audited.</sub>
 
 </div>
-GitFi.fun sync ID: GF-969A1BC6-963AFEE9 · wallet nurw3b.testnet · repo 0xnurrabby/gitfi
