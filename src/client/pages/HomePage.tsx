@@ -8,7 +8,6 @@ import {
   GitBranch,
   LockKeyhole,
   TrendingUp,
-  Trophy,
 } from "lucide-react";
 import type { HomeResponse, TokenSummary } from "../../shared/types.js";
 import { api } from "../lib/api.js";
@@ -17,12 +16,10 @@ import {
   formatPercent,
   formatPrice,
   formatUsd,
-  formatCompact,
   shortNumber,
 } from "../../shared/format.js";
 import { AssetLogo } from "../components/AssetLogo.js";
 import {
-  ActivityFeed,
   Change,
   FreshTokenCard,
   MarketTable,
@@ -345,8 +342,9 @@ export function HomePage() {
             Invest in the code
           </h1>
           <p className="hero-sub">
-            Public repositories become real markets. Verified builders launch, traders price
-            the work, and every trade pays the people who ship the code.
+            GitFi turns any public repository into a utility token of its own, with a live
+            on-chain market. The work can now be discovered, priced, funded and owned by
+            the people who actually use it.
           </p>
           <div className="hero-actions">
             <Link to="/explore" className={buttonClass("primary", "lg")}>
@@ -433,35 +431,6 @@ export function HomePage() {
               emptyBody="Only the verified repository owner can create a market. Prove a README to launch the first one."
             />
           </Card>
-          <div className="home-side">
-            <Card className="activity-card">
-              <ActivityFeed items={data.activity} compact limit={8} />
-              <Link to="/leaderboard" className="card-footer-link">Protocol activity <ArrowRight size={12} /></Link>
-            </Card>
-            <Card className="traders-card">
-              <div className="side-card-head">
-                <span className="eyebrow">XP LEADERS</span>
-                <Trophy size={14} />
-              </div>
-              {data.topTraders.slice(0, 5).map((trader) => (
-                <div className="trader-row" key={trader.address}>
-                  <span className="trader-rank mono">{String(trader.rank).padStart(2, "0")}</span>
-                  <span className="trader-avatar">{trader.displayName.slice(0, 2).toUpperCase()}</span>
-                  <div className="trader-copy">
-                    <strong>{trader.displayName}</strong>
-                    <span className="mono">{trader.trades} trades</span>
-                  </div>
-                  <div className="trader-right">
-                    <strong className="mono">{formatCompact(trader.xp)}</strong>
-                    <span className={trader.pnlMicro >= 0 ? "text-positive" : "text-negative"}>
-                      {formatUsd(trader.pnlMicro, { compact: true, sign: true })}
-                    </span>
-                  </div>
-                </div>
-              ))}
-              <Link to="/leaderboard" className="card-footer-link">Full leaderboard <ArrowRight size={12} /></Link>
-            </Card>
-          </div>
         </div>
       </section>
 
