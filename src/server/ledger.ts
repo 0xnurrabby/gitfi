@@ -15,6 +15,17 @@ let cachedKey: OracleKey | null = null;
 
 export function oracleKey(): OracleKey {
   if (cachedKey) return cachedKey;
+  const envSeed = process.env.ORACLE_SEED_HEX?.trim();
+  if (envSeed && /^[0-9a-f]{64}$/i.test(envSeed)) {
+    const seed = Buffer.from(envSeed, "hex");
+    const pair = nacl.sign.keyPair.fromSeed(seed);
+    cachedKey = {
+      seedHex: envSeed.toLowerCase(),
+      publicKeyHex: Buffer.from(pair.publicKey).toString("hex"),
+      secretKeyHex: Buffer.from(pair.secretKey).toString("hex"),
+    };
+    return cachedKey;
+  }
   const file = path.join(dataDir, "oracle-key.json");
   try {
     const parsed = JSON.parse(fs.readFileSync(file, "utf8")) as OracleKey;
