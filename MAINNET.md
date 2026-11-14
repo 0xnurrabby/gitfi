@@ -22,12 +22,14 @@ Use dedicated accounts. Do not use a personal wallet as the protocol owner.
 
 | Account | Purpose | Suggested balance |
 |---|---|---|
-| `deployer.near` | Pays contract deploy and gas | 30+ NEAR |
-| `owner.near` | Protocol owner; ideally a multisig/DAO | small gas balance |
-| `oracle.<owner>.near` | Repo deed and receipt anchors | 2+ NEAR |
-| `registry.<owner>.near` | Repo registry contract | 6+ NEAR at create |
-| `market.<owner>.near` | Market contract | 25+ NEAR, including a storage buffer |
-| `fees.<owner>.near` | Platform launch fee address | receive-only |
+| `deployer.near` | Pays contract deploy and gas | 14+ NEAR |
+| `owner.near` | Protocol owner; ideally a multisig/DAO | 0.2 NEAR |
+| `oracle.<owner>.near` | Repo deed and receipt anchors | 0.2 NEAR |
+| `registry.<owner>.near` | Repo registry contract | 4.2 NEAR at create |
+| `market.<owner>.near` | Market contract | 8 NEAR, including a 3.7 NEAR storage buffer |
+| `fees.<owner>.near` | Platform launch fee address | 0.01 NEAR |
+
+Most of that is **storage staking**, not gas. NEAR gas for the deploy is cents. Contract code is about 798 KB across both contracts, which locks roughly 8 NEAR. That storage deposit is refundable if a contract account is deleted. The remaining balance is the market storage buffer and small account reserves. The deploy script currently requires about **12.61 NEAR plus gas**.
 
 The exact funding depends on current storage prices. Run:
 

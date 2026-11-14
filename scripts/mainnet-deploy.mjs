@@ -18,11 +18,11 @@ const ownerKeyFile = "data/mainnet-owner-key.json";
 const oracleKeyFile = "data/mainnet-oracle-key.json";
 
 const NEAR = 10n ** 24n;
-const REGISTRY_FUND = 5n * NEAR;
-const MARKET_FUND = 12n * NEAR;
-const OWNER_FUND = NEAR / 2n;
-const ORACLE_FUND = NEAR / 2n;
-const FEES_FUND = NEAR / 10n;
+const REGISTRY_FUND = 42n * NEAR / 10n;
+const MARKET_FUND = 8n * NEAR;
+const OWNER_FUND = NEAR / 5n;
+const ORACLE_FUND = NEAR / 5n;
+const FEES_FUND = NEAR / 100n;
 
 function loadOrCreateKey(file) {
   if (fs.existsSync(file)) {
