@@ -178,6 +178,7 @@ If nobody has staked yet, the staker share remains in the contract as team/platf
 | README proof and repo ownership claims | Live | `/proof` and the repo registry |
 | Repo Registry contract | Live | [`registry.gitfi-395012.testnet`](https://explorer.testnet.near.org/accounts/registry.gitfi-395012.testnet) |
 | GitFi Market contract | Live | [`market.gitfi-395012.testnet`](https://explorer.testnet.near.org/accounts/market.gitfi-395012.testnet) |
+| First verified market | Live | [`$OMNI`](https://gitfi.fun/real/tok_a9934dac7c4cd9fa4314) for `0xnurrabby/omni-vision-pro` |
 | Wallet-signed buy and sell | Live | Market contract |
 | On-chain balances, cost basis and PnL | Live | `/real/:tokenId` |
 | 1.3% fee split + claims | Live | Market contract |
@@ -189,7 +190,7 @@ If nobody has staked yet, the staker share remains in the contract as team/platf
 | Standalone NEP-141 token per repo | Not yet | Mainnet roadmap |
 | External security audit | Not yet | Mainnet checklist |
 
-The old seeded testnet tokens were removed. The active market state is intentionally clean, and every new market must be created by a verified repository owner.
+The old seeded testnet tokens were removed from the active database and market contract. The first real market, `$OMNI` for `0xnurrabby/omni-vision-pro`, was launched through the live README proof, 1 NEAR fee and on-chain market flow.
 
 ---
 
