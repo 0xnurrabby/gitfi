@@ -586,8 +586,73 @@ fn normalize_repo(input: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::normalize_repo;
+    use super::*;
+    use ed25519_dalek::{Signer, SigningKey};
+    use near_sdk::test_utils::VMContextBuilder;
+    use near_sdk::testing_env;
     use std::collections::HashSet;
+
+    fn account(name: &str) -> AccountId {
+        name.parse().unwrap()
+    }
+
+    fn signing_key() -> SigningKey {
+        SigningKey::from_bytes(&[7u8; 32])
+    }
+
+    fn context(predecessor: &str, timestamp: u64) -> VMContextBuilder {
+        let mut builder = VMContextBuilder::new();
+        builder
+            .current_account_id(account("registry.testnet"))
+            .signer_account_id(account(predecessor))
+            .predecessor_account_id(account(predecessor))
+            .account_balance(near_sdk::NearToken::from_near(100))
+            .block_timestamp(timestamp);
+        builder
+    }
+
+    fn envelope(
+        repo: &str,
+        token_id: &str,
+        owner: Option<AccountId>,
+        metadata_uri: &str,
+        nonce: [u8; 32],
+        issued_at: u64,
+    ) -> Vec<u8> {
+        near_sdk::borsh::to_vec(&DeedMessage {
+            repo: repo.to_string(),
+            token_id: token_id.to_string(),
+            owner,
+            metadata_uri: metadata_uri.to_string(),
+            nonce,
+            issued_at,
+        })
+        .unwrap()
+    }
+
+    fn registry() -> Contract {
+        let oracle = signing_key().verifying_key().to_bytes().to_vec();
+        testing_env!(context("owner.testnet", 1_700_000_000_000_000_000).build());
+        Contract::new(account("owner.testnet"), oracle)
+    }
+
+    fn mint(contract: &mut Contract, repo: &str, token_id: &str, buyer: &str) {
+        let issued_at = 1_700_000_000_000_000_000u64;
+        let nonce = [9u8; 32];
+        let owner = Some(account(buyer));
+        let bytes = envelope(repo, token_id, owner.clone(), "https://gitfi.fun/api/nft/tok/metadata", nonce, issued_at);
+        let signature = signing_key().sign(&bytes).to_bytes().to_vec();
+        testing_env!(context(buyer, issued_at).build());
+        contract.mint_repo_deed(
+            repo.to_string(),
+            token_id.to_string(),
+            owner,
+            "https://gitfi.fun/api/nft/tok/metadata".to_string(),
+            nonce,
+            U64(issued_at),
+            signature,
+        );
+    }
 
     #[test]
     fn normalizes_repo_paths() {
@@ -599,6 +664,63 @@ mod tests {
     #[should_panic]
     fn rejects_nested_paths() {
         normalize_repo("owner/repo/tree/main");
+    }
+
+    #[test]
+    fn mints_a_deed_and_blocks_duplicates() {
+        let mut contract = registry();
+        mint(&mut contract, "0xnurrabby/omni-vision-pro", "tok_1", "buyer.testnet");
+        let deed = contract.deed_for_repo("0xnurrabby/omni-vision-pro".to_string()).unwrap();
+        assert_eq!(deed.owner_id, Some(account("buyer.testnet")));
+        assert_eq!(deed.status, "staked");
+        assert_eq!(contract.total_deeds(), 1);
+    }
+
+    #[test]
+    #[should_panic(expected = "repository already has a deed")]
+    fn rejects_a_second_deed_for_the_same_repo() {
+        let mut contract = registry();
+        mint(&mut contract, "0xnurrabby/omni-vision-pro", "tok_1", "buyer.testnet");
+        mint(&mut contract, "0xnurrabby/omni-vision-pro", "tok_2", "buyer.testnet");
+    }
+
+    #[test]
+    #[should_panic(expected = "invalid oracle signature")]
+    fn rejects_a_bad_oracle_signature() {
+        let mut contract = registry();
+        let issued_at = 1_700_000_000_000_000_000u64;
+        let nonce = [9u8; 32];
+        let bytes = envelope(
+            "0xnurrabby/omni-vision-pro",
+            "tok_1",
+            Some(account("buyer.testnet")),
+            "https://gitfi.fun/api/nft/tok/metadata",
+            nonce,
+            issued_at,
+        );
+        let mut signature = signing_key().sign(&bytes).to_bytes().to_vec();
+        signature[0] ^= 1;
+        testing_env!(context("buyer.testnet", issued_at).build());
+        contract.mint_repo_deed(
+            "0xnurrabby/omni-vision-pro".to_string(),
+            "tok_1".to_string(),
+            Some(account("buyer.testnet")),
+            "https://gitfi.fun/api/nft/tok/metadata".to_string(),
+            nonce,
+            U64(issued_at),
+            signature,
+        );
+    }
+
+    #[test]
+    fn two_step_owner_transfer() {
+        let mut contract = registry();
+        testing_env!(context("owner.testnet", 1_700_000_000_000_000_000).build());
+        contract.propose_owner(account("next.testnet"));
+        testing_env!(context("next.testnet", 1_700_000_000_000_000_000).build());
+        contract.accept_owner();
+        assert_eq!(contract.owner_id, account("next.testnet"));
+        assert!(contract.pending_owner.is_none());
     }
 
     #[test]

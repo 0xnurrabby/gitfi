@@ -294,6 +294,8 @@ get_market / get_balance / get_cost / get_trades / get_bounties
 Contract source: [`contracts/market/src/lib.rs`](./contracts/market/src/lib.rs)  
 Deployment notes: [`contracts/README.md`](./contracts/README.md)
 
+Mainnet runbook: [`MAINNET.md`](./MAINNET.md)
+
 ---
 
 ## Quick start

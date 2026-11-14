@@ -674,3 +674,154 @@ impl Contract {
         self.history.insert(&id, &trade);
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use near_sdk::test_utils::VMContextBuilder;
+    use near_sdk::testing_env;
+
+    fn account(name: &str) -> AccountId {
+        name.parse().unwrap()
+    }
+
+    fn context(predecessor: &str, deposit: u128) -> VMContextBuilder {
+        let mut builder = VMContextBuilder::new();
+        builder
+            .current_account_id(account("market.testnet"))
+            .signer_account_id(account(predecessor))
+            .predecessor_account_id(account(predecessor))
+            .account_balance(NearToken::from_near(100))
+            .attached_deposit(NearToken::from_yoctonear(deposit))
+            .block_timestamp(1_700_000_000_000_000_000);
+        builder
+    }
+
+    fn market_contract(owner: &str) -> Contract {
+        testing_env!(context(owner, 0).build());
+        Contract::new(account(owner))
+    }
+
+    fn create(contract: &mut Contract, owner: &str) {
+        testing_env!(context(owner, 0).build());
+        contract.create_market(
+            "tok_1".to_string(),
+            "owner/repo".to_string(),
+            "TEST".to_string(),
+            Some(account("creator.testnet")),
+            U128(1_000_000),
+            U128(500_000),
+            U128(10_000),
+            U128(50),
+            U128(100_000),
+        );
+    }
+
+    #[test]
+    fn creates_market_with_a_capped_step() {
+        let mut contract = market_contract("owner.testnet");
+        create(&mut contract, "owner.testnet");
+        let market = contract.get_market("tok_1".to_string()).unwrap();
+        assert_eq!(market.price, 10_000);
+        assert_eq!(market.step, 50);
+        assert_eq!(market.max_wallet, 100_000);
+        assert_eq!(market.reserve, 0);
+    }
+
+    #[test]
+    #[should_panic(expected = "step too large")]
+    fn rejects_an_arbitrageable_step() {
+        let mut contract = market_contract("owner.testnet");
+        testing_env!(context("owner.testnet", 0).build());
+        contract.create_market(
+            "tok_1".to_string(),
+            "owner/repo".to_string(),
+            "TEST".to_string(),
+            Some(account("creator.testnet")),
+            U128(1_000_000),
+            U128(500_000),
+            U128(10_000),
+            U128(100),
+            U128(0),
+        );
+    }
+
+    #[test]
+    fn buy_moves_price_and_tracks_balance_fees() {
+        let mut contract = market_contract("owner.testnet");
+        create(&mut contract, "owner.testnet");
+
+        testing_env!(context("buyer.testnet", 1_000_000).build());
+        let tokens = contract.buy("tok_1".to_string(), None).0;
+        assert_eq!(tokens, 98);
+        let market = contract.get_market("tok_1".to_string()).unwrap();
+        assert_eq!(market.price, 10_050);
+        assert_eq!(market.reserve, 987_000);
+        assert_eq!(
+            contract.get_balance("tok_1".to_string(), account("buyer.testnet")).0,
+            98
+        );
+        assert_eq!(contract.get_trades("tok_1".to_string(), None).len(), 1);
+        assert!(contract.get_platform_fees().0 > 0);
+        assert!(contract.get_dev_fees("tok_1".to_string()).0 > 0);
+    }
+
+    #[test]
+    #[should_panic(expected = "wallet holding cap reached")]
+    fn rejects_a_buy_above_the_wallet_cap() {
+        let mut contract = market_contract("owner.testnet");
+        testing_env!(context("owner.testnet", 0).build());
+        contract.create_market(
+            "tok_1".to_string(),
+            "owner/repo".to_string(),
+            "TEST".to_string(),
+            Some(account("creator.testnet")),
+            U128(1_000_000),
+            U128(500_000),
+            U128(10_000),
+            U128(50),
+            U128(100),
+        );
+        testing_env!(context("buyer.testnet", 2_000_000).build());
+        contract.buy("tok_1".to_string(), None);
+    }
+
+    #[test]
+    fn sells_after_graduation() {
+        let mut contract = market_contract("owner.testnet");
+        create(&mut contract, "owner.testnet");
+        let key = balance_key("tok_1", &account("seller.testnet"));
+        let mut market = contract.get_market("tok_1".to_string()).unwrap();
+        market.status = "graduated".to_string();
+        market.reserve = 20_000_000;
+        contract.markets.insert(&"tok_1".to_string(), &market);
+        contract.balances.insert(&key, &1_000);
+        contract.costs.insert(&key, &1_000);
+        testing_env!(context("seller.testnet", 0).build());
+        let _ = contract.sell("tok_1".to_string(), U128(1_000), Some(U128(1)));
+        assert_eq!(
+            contract.get_balance("tok_1".to_string(), account("seller.testnet")).0,
+            0
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "buying is paused")]
+    fn paused_buy_reverts() {
+        let mut contract = market_contract("owner.testnet");
+        create(&mut contract, "owner.testnet");
+        contract.set_paused(true);
+        testing_env!(context("buyer.testnet", 1_000_000).build());
+        contract.buy("tok_1".to_string(), None);
+    }
+
+    #[test]
+    fn two_step_owner_transfer() {
+        let mut contract = market_contract("owner.testnet");
+        contract.propose_owner(account("next.testnet"));
+        testing_env!(context("next.testnet", 0).build());
+        contract.accept_owner();
+        assert_eq!(contract.owner_id, account("next.testnet"));
+        assert!(contract.pending_owner.is_none());
+    }
+}

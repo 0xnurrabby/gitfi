@@ -35,3 +35,21 @@ test("the 1.3% fee split stays inside the fee", () => {
   assert.equal(creator + platform + stakers, 130);
   assert.equal(stakers, 50);
 });
+
+test("a buyer-funded reserve covers a full round trip", () => {
+  const price = 10_000_000n;
+  const deposit = 100_000_000n;
+  const feeBps = 130n;
+  const stepBps = 50n;
+  const fee = (deposit * feeBps) / 10_000n;
+  const net = deposit - fee;
+  const tokens = net / price;
+  const reserve = net;
+  const nextPrice = price + (price * stepBps) / 10_000n;
+  const gross = tokens * nextPrice;
+  const sellFee = (gross * feeBps) / 10_000n;
+  const sellerReceives = gross - sellFee;
+  assert.ok(reserve >= sellerReceives);
+  assert.ok(sellerReceives < deposit);
+});
+
