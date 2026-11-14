@@ -14,7 +14,7 @@ Own the work. Price the work. Let the market discover the work.
 <br />
 
 [![NEAR testnet](https://img.shields.io/badge/NEAR-testnet-c9f45d?style=flat-square&labelColor=101510)](https://explorer.testnet.near.org/accounts/market.gitfi-395012.testnet)
-[![Docs](https://img.shields.io/badge/docs-docs.gitfi.fun-c9f45d?style=flat-square&labelColor=101510)](https://docs.gitfi.fun)
+[![Docs](https://img.shields.io/badge/docs-live-c9f45d?style=flat-square&labelColor=101510)](https://0xnurrabby.github.io/gitfi/)
 [![Verify](https://github.com/0xnurrabby/gitfi/actions/workflows/verify.yml/badge.svg)](https://github.com/0xnurrabby/gitfi/actions/workflows/verify.yml)
 [![License](https://img.shields.io/badge/license-MIT-101510?style=flat-square)](./LICENSE)
 [![GitHub OAuth](https://img.shields.io/badge/GitHub_OAuth-none-c9f45d?style=flat-square&labelColor=101510)](#proof-of-ownership)
