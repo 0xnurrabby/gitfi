@@ -448,7 +448,7 @@ GitFi is an experiment in making public work legible to markets without asking b
 
 **Public code. Priced in public.**
 
-[Website](https://gitfi.fun) · [Live testnet](https://gitfi-fun.nurrabby01-bd.workers.dev) · [Docs](https://docs.gitfi.fun) · [Market contract](https://explorer.testnet.near.org/accounts/market.gitfi-395012.testnet) · [Proof ledger](https://gitfi.fun/proof)
+[Live testnet](https://gitfi-fun.nurrabby01-bd.workers.dev) · [Docs](https://0xnurrabby.github.io/gitfi/) · [Market contract](https://explorer.testnet.near.org/accounts/market.gitfi-395012.testnet) · [Proof ledger](https://gitfi-fun.nurrabby01-bd.workers.dev/proof)
 
 <sub>Built for the NEAR ecosystem. Testnet build. Not audited.</sub>
 
