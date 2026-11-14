@@ -3,30 +3,22 @@ export function BrandMark({ size = 28 }: { size?: number }) {
     <svg
       width={size}
       height={size}
-      viewBox="0 0 64 64"
+      viewBox="0 0 32 32"
       fill="none"
       aria-hidden="true"
       className="brand-mark-svg"
     >
-      <rect x="1" y="1" width="62" height="62" rx="15" className="brand-mark-bg" />
-      <path d="M21 14v36" className="brand-mark-line" strokeWidth="3.4" strokeLinecap="round" />
-      <circle cx="21" cy="14" r="4.7" className="brand-mark-node" />
-      <circle cx="21" cy="50" r="4.7" className="brand-mark-node" />
       <path
-        d="M21 31h10c5.2 0 9-4 9-9v-3.3"
-        className="brand-mark-line"
-        strokeWidth="3.4"
-        strokeLinecap="round"
-      />
-      <circle cx="40" cy="14" r="4.7" className="brand-mark-bg" />
-      <circle cx="40" cy="14" r="4.7" className="brand-mark-line" strokeWidth="3" />
-      <path d="M27 42h6" className="brand-mark-line" strokeWidth="3" strokeLinecap="round" />
-      <path
-        d="M33 39l4 3-4 3"
-        className="brand-mark-line"
-        strokeWidth="2.4"
-        strokeLinecap="round"
+        d="M16 3 28 10v12L16 29 4 22V10L16 3Z"
+        stroke="currentColor"
+        strokeWidth="1.7"
         strokeLinejoin="round"
+      />
+      <path
+        d="M16 10v12M10 13.5v5M22 13.5v5"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
       />
     </svg>
   );

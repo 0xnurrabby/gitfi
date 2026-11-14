@@ -761,13 +761,7 @@ html[data-theme="light"] .badge-lime { color: #506c08; }
   gap: 8px;
   flex-shrink: 0;
 }
-.brand-mark-svg { display: block; }
-.brand-mark-bg { fill: var(--ink); }
-.brand-mark-line { stroke: var(--bg); }
-.brand-mark-node { fill: var(--accent); }
-html[data-theme="dark"] .brand-mark-bg { fill: var(--accent); }
-html[data-theme="dark"] .brand-mark-line { stroke: var(--accent-ink); }
-html[data-theme="dark"] .brand-mark-node { fill: var(--accent-ink); }
+.brand-mark-svg { display: block; color: var(--ink); }
 .brand-word {
   font-size: 17.5px;
   font-weight: 680;
