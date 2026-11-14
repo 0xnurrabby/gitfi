@@ -55,6 +55,8 @@
       </div>
     </header>
 
+    <div class="read-progress" aria-hidden="true"><span id="readProgress"></span></div>
+
     <div class="docs-shell">
       <aside class="sidebar" id="sidebar" aria-label="Documentation navigation">
         <div class="sidebar-inner">
@@ -108,7 +110,8 @@
 
       <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
-      <main class="docs-main" id="introduction">
+      <main class="docs-main">
+        <div class="docs-content">
         <div class="hero">
           <div class="hero-grid" aria-hidden="true"></div>
           <div class="hero-copy">
@@ -168,7 +171,7 @@
           </div>
         </div>
 
-        <section class="doc-section lead-section">
+        <section class="doc-section lead-section" id="introduction">
           <p class="section-kicker">Introduction</p>
           <h2>Open source built the world. The market looked away.</h2>
           <p class="lead">
@@ -957,6 +960,24 @@
           </div>
           <p class="mono footer-fine">TESTNET BUILD · NOT AUDITED · DOCS v2</p>
         </footer>
+        </div>
+
+        <aside class="docs-rail" aria-label="On this page">
+          <div class="rail-sticky">
+            <div class="rail-block">
+              <p class="rail-label">On this page</p>
+              <nav class="rail-toc" id="railToc"></nav>
+            </div>
+            <div class="rail-card">
+              <span class="rail-label">Live on testnet</span>
+              <strong>GitFi.fun</strong>
+              <p>Owner-verified repo markets, wallet-signed trades and real fee yield.</p>
+              <a class="rail-cta" href="/" data-app-link>Open app <span aria-hidden="true">&nearr;</span></a>
+              <a class="rail-link" href="https://explorer.testnet.near.org/accounts/registry.gitfi-395012.testnet" target="_blank" rel="noreferrer">Repo registry <span aria-hidden="true">&nearr;</span></a>
+              <a class="rail-link" href="https://explorer.testnet.near.org/accounts/market.gitfi-395012.testnet" target="_blank" rel="noreferrer">Market contract <span aria-hidden="true">&nearr;</span></a>
+            </div>
+          </div>
+        </aside>
       </main>
     </div>
 
