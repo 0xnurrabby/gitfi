@@ -46,6 +46,13 @@ MAINNET_CONFIRM=DEPLOY npm run mainnet:deploy
 
 The script creates the owner, oracle, fees, registry and market subaccounts, deploys both contracts, initializes them, and writes the owner and oracle key files under `data/`. Do not commit those files.
 
+The registry deed oracle public key comes from `data/mainnet-oracle-seed.txt`. The oracle account's transaction key is separate. Set both in Render:
+
+```ini
+ORACLE_SEED_HEX=<contents of data/mainnet-oracle-seed.txt>
+NEAR_ORACLE_PRIVATE_KEY=<secret_key from data/mainnet-oracle-key.json>
+```
+
 ## Environment
 
 ```ini

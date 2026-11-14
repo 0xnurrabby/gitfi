@@ -1,5 +1,6 @@
 import fs from "node:fs";
-import bs58 from "bs58";
+import crypto from "node:crypto";
+import nacl from "tweetnacl";
 import { Account, JsonRpcProvider, KeyPair, KeyPairSigner, actions } from "near-api-js";
 
 const RPC = process.env.MAINNET_RPC_URL ?? "https://rpc.mainnet.fastnear.com";
@@ -38,6 +39,22 @@ const deployerKeyFile = JSON.parse(fs.readFileSync(keyFile, "utf8"));
 const deployerKey = KeyPair.fromString(deployerKeyFile.private_key);
 const ownerKey = loadOrCreateKey(ownerKeyFile);
 const oracleKey = loadOrCreateKey(oracleKeyFile);
+const oracleSeedFile = "data/mainnet-oracle-seed.txt";
+let oracleSeed = process.env.ORACLE_SEED_HEX?.trim();
+if (!oracleSeed) {
+  if (fs.existsSync(oracleSeedFile)) {
+    oracleSeed = fs.readFileSync(oracleSeedFile, "utf8").trim();
+  } else {
+    oracleSeed = crypto.randomBytes(32).toString("hex");
+    fs.writeFileSync(oracleSeedFile, oracleSeed);
+  }
+}
+if (!/^[0-9a-f]{64}$/i.test(oracleSeed)) {
+  throw new Error("ORACLE_SEED_HEX must be 32 bytes of hex");
+}
+const deedPublicKey = Buffer.from(
+  nacl.sign.keyPair.fromSeed(Buffer.from(oracleSeed, "hex")).publicKey,
+);
 const registryCode = new Uint8Array(fs.readFileSync(registryWasm));
 const marketCode = new Uint8Array(fs.readFileSync(marketWasm));
 
@@ -125,7 +142,7 @@ if (Number(deployerInfo.amount) < (REGISTRY_FUND + MARKET_FUND + OWNER_FUND + OR
 
 const ownerPublicKey = ownerKey.getPublicKey();
 const oraclePublicKey = oracleKey.getPublicKey();
-const oracleBytes = Array.from(bs58.decode(oraclePublicKey.toString().replace(/^ed25519:/, "")));
+const oracleBytes = Array.from(deedPublicKey);
 
 await createAccount({
   accountId: ownerId,
@@ -162,7 +179,8 @@ await createAccount({
 console.log("registry deeds", await view(registryId, "total_deeds"));
 console.log("market count", await view(marketId, "get_markets", { from_index: 0, limit: 10 }));
 console.log("owner key file", ownerKeyFile);
-console.log("oracle key file", oracleKeyFile);
+console.log("oracle NEAR key file", oracleKeyFile);
+console.log("oracle deed seed file", oracleSeedFile);
 console.log("Deployment complete. Set Render env:");
 console.log("NEAR_NETWORK=mainnet");
 console.log(`NEAR_CONTRACT_ID=${registryId}`);
