@@ -8,6 +8,10 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
+    if (url.hostname === "www.gitfi.fun") {
+      return Response.redirect(`https://gitfi.fun${url.pathname}${url.search}`, 301);
+    }
+
     if (url.hostname.toLowerCase().startsWith("docs.")) {
       const docsPath = url.pathname === "/" ? "/docs/" : `/docs${url.pathname}`;
       return env.ASSETS.fetch(new Request(new URL(docsPath, url.origin), request));

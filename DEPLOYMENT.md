@@ -4,11 +4,11 @@ GitFi is deployed as three pieces:
 
 | Piece | Host | Live URL |
 |---|---|---|
-| Frontend + API proxy | Cloudflare Worker with static assets | `https://gitfi-fun.nurrabby01-bd.workers.dev` |
+| Frontend + API proxy | Cloudflare Worker with static assets | `https://gitfi.fun` |
 | Backend API | Render web service | `https://gitfi-api.onrender.com` |
 | Database | Turso | `libsql://gitfi-gitfi.aws-ap-south-1.turso.io` |
 
-The intended public domain is `gitfi.fun`. The domain currently uses Spaceship nameservers, so attaching it to Cloudflare requires a DNS change at the registrar or a CNAME at the current DNS provider. The Worker and API are live on their provider URLs until that DNS step is completed.
+The primary domain is `gitfi.fun`. `docs.gitfi.fun` serves the handbook from the same Worker. `www.gitfi.fun` redirects to the primary domain.
 
 ## 1. Turso
 
@@ -89,34 +89,23 @@ The Worker serves:
 - `/docs/` and `/llms.txt`
 - `/api/*`, `/ws`, `/cdn/*`, `/uploads/*` proxied to Render
 
-### Custom domain
+### Domains
 
-The intended domains are:
+- `gitfi.fun` - primary app
+- `docs.gitfi.fun` - docs
+- `www.gitfi.fun` - redirects to `gitfi.fun`
 
-- `gitfi.fun` - frontend
-- `docs.gitfi.fun` - documentation (also available at `/docs/` and GitHub Pages)
+`gitfi.fun` and `docs.gitfi.fun` are active Cloudflare zones/domains. The Worker serves the app at the apex, maps the docs host to the docs bundle, and redirects `www` to the apex. API and uploads are proxied under the same origin.
 
-`gitfi.fun` currently uses Spaceship nameservers (`launch1.spaceship.net`, `launch2.spaceship.net`), not Cloudflare. A Cloudflare Worker custom domain requires the domain to be an active zone in the Cloudflare account. The Worker and API are therefore live on their provider URLs until the nameservers are moved to Cloudflare or the domain is otherwise delegated.
-
-Once `gitfi.fun` is an active Cloudflare zone, add a Worker custom domain:
-
-```bash
-# Cloudflare Dashboard -> Workers -> gitfi-fun -> Settings -> Domains
-# Add gitfi.fun
-```
-
-Then add a `docs` DNS record or a second Worker route for `docs.gitfi.fun`. The static docs also work immediately on GitHub Pages and at `/docs/`.
+The static docs also work on GitHub Pages and at `/docs/`.
 
 ## 4. Docs
 
 Docs are static and independent of the API:
 
 - App: `/docs/`
-- Worker: `https://<worker-domain>/docs/`
+- Production: `https://docs.gitfi.fun`
 - GitHub Pages: `https://0xnurrabby.github.io/gitfi/`
-- Target: `https://docs.gitfi.fun`
-
-The Worker can serve docs at the root when the host starts with `docs.` if the same Render/Express backend is used behind it.
 
 ## Health checks
 
