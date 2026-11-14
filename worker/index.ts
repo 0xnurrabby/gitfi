@@ -104,7 +104,12 @@ export default {
     }
 
     if (url.hostname.toLowerCase().startsWith("docs.")) {
-      const docsPath = url.pathname === "/" ? "/docs/" : `/docs${url.pathname}`;
+      const docsPath =
+        url.pathname === "/"
+          ? "/docs/"
+          : url.pathname.startsWith("/docs/")
+            ? url.pathname
+            : `/docs${url.pathname}`;
       return env.ASSETS.fetch(new Request(new URL(docsPath, url.origin), request));
     }
 
