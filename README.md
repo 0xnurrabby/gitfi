@@ -335,6 +335,9 @@ It covers:
 
 Machine-readable project summary: [`llms.txt`](./public/llms.txt)
 
+GitHub Pages preview: `https://0xnurrabby.github.io/gitfi/`  
+Production docs target: `https://docs.gitfi.fun`
+
 ---
 
 ## Repository map
