@@ -1,5 +1,7 @@
 import fs from "node:fs";
 import crypto from "node:crypto";
+import os from "node:os";
+import path from "node:path";
 import nacl from "tweetnacl";
 import { Account, JsonRpcProvider, KeyPair, KeyPairSigner, actions } from "near-api-js";
 
@@ -13,9 +15,11 @@ const feesId = process.env.PLATFORM_FEE_ADDRESS ?? "fees.gitfifun.near";
 
 const registryWasm = "contracts/target/wasm32-unknown-unknown/release/gitfi_repo_registry.wasm";
 const marketWasm = "contracts/target/wasm32-unknown-unknown/release/gitfi_market.wasm";
-const keyFile = "data/mainnet-deployer-key.json";
-const ownerKeyFile = "data/mainnet-owner-key.json";
-const oracleKeyFile = "data/mainnet-oracle-key.json";
+const credentialsDir = path.join(os.homedir(), ".near-credentials", "mainnet");
+const keyFile = process.env.MAINNET_DEPLOYER_KEY_FILE ?? path.join(credentialsDir, `${deployerId}.json`);
+const ownerKeyFile = path.join(credentialsDir, "gitfi-owner-key.json");
+const oracleKeyFile = path.join(credentialsDir, "gitfi-oracle-key.json");
+const oracleSeedFile = path.join(credentialsDir, "gitfi-oracle-seed.txt");
 
 const NEAR = 10n ** 24n;
 const REGISTRY_FUND = 42n * NEAR / 10n;
@@ -39,7 +43,6 @@ const deployerKeyFile = JSON.parse(fs.readFileSync(keyFile, "utf8"));
 const deployerKey = KeyPair.fromString(deployerKeyFile.private_key);
 const ownerKey = loadOrCreateKey(ownerKeyFile);
 const oracleKey = loadOrCreateKey(oracleKeyFile);
-const oracleSeedFile = "data/mainnet-oracle-seed.txt";
 let oracleSeed = process.env.ORACLE_SEED_HEX?.trim();
 if (!oracleSeed) {
   if (fs.existsSync(oracleSeedFile)) {
