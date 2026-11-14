@@ -1585,6 +1585,16 @@ html[data-theme="light"] .terminal-trending { color: #4f6c05; }
 .auth-compact h2 { font-size: 27px; font-weight: 560; letter-spacing: -0.045em; line-height: 1.05; margin: 0; }
 .auth-compact p { color: var(--muted); font-size: 12px; line-height: 1.5; margin: 0 0 8px; }
 .auth-compact .form-error { width: 100%; margin-bottom: 2px; }
+.auth-network-note {
+  display: flex; flex-direction: column; gap: 3px; width: 100%;
+  padding: 10px 12px; border: 1px solid var(--accent-line);
+  border-radius: var(--radius-sm); background: var(--accent-soft);
+}
+.auth-network-note strong {
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--accent-deep);
+}
+.auth-network-note span { font-size: 11.5px; line-height: 1.45; color: var(--muted); }
 .auth-compact-cta { width: 100%; margin-top: 4px; }
 .auth-compact-note { display: flex; align-items: center; gap: 5px; margin-top: 8px; color: var(--faint); font-family: var(--font-mono); font-size: 7.5px; letter-spacing: 0.02em; }
 .auth-compact-note svg { color: var(--positive); flex-shrink: 0; }

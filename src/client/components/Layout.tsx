@@ -98,7 +98,7 @@ function AccountMenu() {
     return (
       <button className={buttonClass("primary", "sm", "wallet-btn")} onClick={openAuth}>
         <Wallet size={14} />
-        <span>Connect NEAR</span>
+        <span>Connect {platform?.network === "mainnet" ? "mainnet" : "testnet"}</span>
       </button>
     );
   }
@@ -169,7 +169,7 @@ function AccountMenu() {
 }
 
 function MobileMenu({ onClose }: { onClose: () => void }) {
-  const { user, openAuth } = useAuth();
+  const { user, platform, openAuth } = useAuth();
   return (
     <div className="mobile-menu">
       <div className="mobile-menu-head">
@@ -211,7 +211,7 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
               openAuth();
             }}
           >
-            <Wallet size={15} /> Connect NEAR
+            <Wallet size={15} /> Connect {platform?.network === "mainnet" ? "mainnet" : "testnet"}
           </button>
         )}
       </div>

@@ -230,7 +230,7 @@ export function LaunchPage() {
   const launchMutation = useMutation({
     mutationFn: async () => {
       if (!user || !nearWallet) {
-        throw new ApiRequestError("Connect your NEAR wallet to pay the launch fee.", 401, "AUTH_REQUIRED");
+        throw new ApiRequestError(`Connect your NEAR ${platform?.network === "mainnet" ? "mainnet" : "testnet"} wallet to pay the launch fee.`, 401, "AUTH_REQUIRED");
       }
       const platformFeeAddress = platform?.platformFeeAddress;
       if (!platformFeeAddress) {

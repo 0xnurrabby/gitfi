@@ -243,7 +243,7 @@ export function OnChainMarketPage() {
     deposit = 0n,
   ) => {
     if (!nearWallet || !user || !data) {
-      throw new ApiRequestError("Connect your NEAR wallet first.", 401, "AUTH_REQUIRED");
+      throw new ApiRequestError(`Connect your NEAR ${isMainnet ? "mainnet" : "testnet"} wallet first.`, 401, "AUTH_REQUIRED");
     }
     const accounts = await nearWallet.getAccounts({
       network: data.network === "mainnet" ? "mainnet" : "testnet",
@@ -780,7 +780,7 @@ export function OnChainMarketPage() {
               onClick={openAuth}
               icon={<Wallet size={15} />}
             >
-              Connect NEAR wallet
+              Connect {isMainnet ? "mainnet" : "testnet"} wallet
             </Button>
           ) : (
             <Button

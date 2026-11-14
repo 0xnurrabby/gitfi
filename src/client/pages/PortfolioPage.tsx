@@ -66,7 +66,7 @@ function nearFromYocto(value: string | bigint, digits = 4): string {
 }
 
 export function PortfolioPage() {
-  const { user, nearWallet, openAuth, loading } = useAuth();
+  const { user, platform, nearWallet, openAuth, loading } = useAuth();
   const { notify } = useToast();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<"positions" | "stakes" | "earnings" | "launches">("positions");
@@ -88,7 +88,7 @@ export function PortfolioPage() {
   const claim = useMutation({
     mutationFn: async ({ tokenId, kind }: { tokenId: string; kind: "developer" | "rewards" }) => {
       if (!data || !nearWallet || !user) {
-        throw new ApiRequestError("Connect your NEAR wallet first.", 401, "AUTH_REQUIRED");
+        throw new ApiRequestError(`Connect your NEAR ${data?.network === "mainnet" ? "mainnet" : "testnet"} wallet first.`, 401, "AUTH_REQUIRED");
       }
       const accounts = await nearWallet.getAccounts({
         network: data.network === "mainnet" ? "mainnet" : "testnet",
@@ -137,12 +137,12 @@ export function PortfolioPage() {
             <em>One on-chain book.</em>
           </h1>
           <p>
-            Connect your NEAR wallet to track real contract balances, cost basis, fee yield and
+            Connect your NEAR {platform?.network === "mainnet" ? "mainnet" : "testnet"} wallet to track real contract balances, cost basis, fee yield and
             every on-chain fill in one place.
           </p>
           <div className="portfolio-guest-actions">
             <Button variant="primary" size="lg" onClick={openAuth} icon={<Wallet size={15} />}>
-              Connect NEAR
+              Connect {platform?.network === "mainnet" ? "mainnet" : "testnet"} wallet
             </Button>
             <Link to="/explore" className={buttonClass("secondary", "lg")}>
               Browse markets

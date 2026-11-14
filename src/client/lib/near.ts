@@ -1,15 +1,18 @@
 import { NearConnector } from "@hot-labs/near-connect";
 
-let connector: NearConnector | null = null;
+const connectors = new Map<string, NearConnector>();
 
 export function getNearConnector(network: string): NearConnector {
+  const resolved = network === "mainnet" ? "mainnet" : "testnet";
+  let connector = connectors.get(resolved);
   if (!connector) {
     connector = new NearConnector({
-      network: network === "mainnet" ? "mainnet" : "testnet",
+      network: resolved,
       // Login requires a wallet that can sign a NEP-413 message.
       features: { signMessage: true },
       autoConnect: false,
     });
+    connectors.set(resolved, connector);
   }
   return connector;
 }

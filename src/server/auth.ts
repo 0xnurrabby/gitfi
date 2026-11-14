@@ -163,9 +163,9 @@ export function createSession(userId: string, userAgent?: string): string {
   const raw = crypto.randomBytes(32).toString("base64url");
   const hash = sha256(raw);
   db.prepare(
-    `INSERT INTO sessions(token_hash, user_id, user_agent, created_at, expires_at)
-     VALUES (?, ?, ?, ?, ?)`,
-  ).run(hash, userId, userAgent ?? null, nowIso(), addSecondsIso(60 * 60 * 24 * 30));
+    `INSERT INTO sessions(token_hash, user_id, network, user_agent, created_at, expires_at)
+     VALUES (?, ?, ?, ?, ?, ?)`,
+  ).run(hash, userId, config.nearNetwork, userAgent ?? null, nowIso(), addSecondsIso(60 * 60 * 24 * 30));
   return raw;
 }
 
@@ -198,9 +198,9 @@ export function userForSessionRaw(raw: string): UserRow | null {
   const row = db
     .prepare(
       `SELECT u.* FROM sessions s JOIN users u ON u.id = s.user_id
-       WHERE s.token_hash = ? AND s.expires_at > ?`,
+       WHERE s.token_hash = ? AND s.expires_at > ? AND s.network = ?`,
     )
-    .get(hash, nowIso()) as UserRow | undefined;
+    .get(hash, nowIso(), config.nearNetwork) as UserRow | undefined;
   return row ?? null;
 }
 

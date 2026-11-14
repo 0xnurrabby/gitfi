@@ -153,6 +153,13 @@ export async function verifyNearAuthChallenge(input: NearAuthInput): Promise<{
   if (challenge.expires_at < nowIso()) {
     throw new ApiError("This sign-in request expired. Try again.", 401, "CHALLENGE_EXPIRED");
   }
+  if (challenge.network !== config.nearNetwork) {
+    throw new ApiError(
+      `This sign-in request belongs to NEAR ${challenge.network}. Refresh the page and sign in on NEAR ${config.nearNetwork}.`,
+      401,
+      "NETWORK_MISMATCH",
+    );
+  }
 
   const accountId = input.accountId.trim().toLowerCase();
   if (!validAccountId(accountId)) {

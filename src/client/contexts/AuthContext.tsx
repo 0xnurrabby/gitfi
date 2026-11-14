@@ -100,6 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const connectNear = useCallback(async () => {
     setConnecting(true);
     setConnectError(null);
+    let expectedNetwork = platform?.network === "mainnet" ? "mainnet" : "testnet";
     try {
       const referral = getStoredReferral();
       const challenge = await api<{
@@ -114,12 +115,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         body: { referral },
       });
       const network = challenge.network === "mainnet" ? "mainnet" : "testnet";
+      expectedNetwork = network;
+      if (platform?.network && platform.network !== network) {
+        throw new Error(
+          `GitFi is running on NEAR ${platform.network}. Refresh the page and connect a ${platform.network} wallet.`,
+        );
+      }
       const connector = getNearConnector(network);
       const wallet = await connector.connect();
-      setNearWallet(wallet);
       const accounts = await wallet.getAccounts({ network });
       const account = accounts[0];
-      if (!account) throw new Error("The wallet did not return a NEAR account.");
+      if (!account) {
+        throw new Error(`This wallet did not return a NEAR ${network} account.`);
+      }
+      setNearWallet(wallet);
       const signed = await wallet.signMessage({
         message: challenge.message,
         recipient: challenge.recipient,
@@ -148,13 +157,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       queryClient.invalidateQueries();
       notify(
         verified.created
-          ? `NEAR wallet connected: ${verified.user.address}`
+          ? `NEAR ${network} wallet connected: ${verified.user.address}`
           : `Welcome back, ${verified.user.displayName}.`,
         { kind: "success", title: verified.created ? "Wallet connected" : "Signed in" },
       );
     } catch (error) {
-      const message =
-        error instanceof ApiRequestError
+      const wrongNetwork =
+        error instanceof ApiRequestError &&
+        (error.code === "KEY_NOT_ON_ACCOUNT" || error.code === "NETWORK_MISMATCH");
+      const message = wrongNetwork
+        ? `This wallet does not control a NEAR ${expectedNetwork} account. Switch your wallet to ${expectedNetwork} and try again.`
+        : error instanceof ApiRequestError
           ? error.message
           : error instanceof Error
             ? error.message
@@ -164,7 +177,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setConnecting(false);
     }
-  }, [notify, queryClient]);
+  }, [notify, platform?.network, queryClient]);
 
   const logout = useCallback(async () => {
     try {

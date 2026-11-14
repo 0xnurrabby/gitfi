@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS sessions (
   token_hash TEXT PRIMARY KEY,
   user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  network TEXT NOT NULL DEFAULT 'testnet',
   user_agent TEXT,
   created_at TEXT NOT NULL,
   expires_at TEXT NOT NULL
@@ -470,6 +471,7 @@ export function initDb(): void {
     "ALTER TABLE tokens ADD COLUMN logo_ipfs_url TEXT",
     "ALTER TABLE tokens ADD COLUMN launch_mc_usd_micro INTEGER NOT NULL DEFAULT 0",
     "ALTER TABLE tokens ADD COLUMN launch_stars INTEGER NOT NULL DEFAULT 0",
+    "ALTER TABLE sessions ADD COLUMN network TEXT NOT NULL DEFAULT 'testnet'",
   ]) {
     try {
       db.exec(statement);
