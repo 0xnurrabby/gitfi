@@ -651,7 +651,7 @@ export function PortfolioPage() {
             </h3>
             <p>
               The repo owner receives 0.5% of every trade, stakers receive 0.5%, and the
-              team receives 0.3%, all claimable directly from the contract. No demo balances.
+              platform receives 0.3%, all claimable directly from the contract. No demo balances.
             </p>
             <Link to="/launch" className={buttonClass("primary", "sm", "full-width")}>
               Launch a repository <ArrowRight size={12} />

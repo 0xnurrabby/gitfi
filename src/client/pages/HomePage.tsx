@@ -295,22 +295,22 @@ const MECHANICS = [
   {
     index: "01",
     icon: <BadgeCheck size={18} />,
-    title: "Proof, not OAuth",
-    copy: "Paste one sync line into a public README. The repo is bound to a wallet and minted as a unique Repo NFT.",
+    title: "Proof, not permission",
+    copy: "One line in a public README binds the repo to a wallet. No OAuth, no app install, no gatekeeper.",
     meta: "Zero GitHub permissions",
   },
   {
     index: "02",
     icon: <TrendingUp size={18} />,
-    title: "A market from the first buy",
-    copy: "Fair-launch curves price the work in public. At graduation the market stays open on-chain with no team allocation.",
-    meta: "No team allocation",
+    title: "A market from day one",
+    copy: "Every repo launches with a real NEAR market. Price discovery starts at the first buy, and the market stays on-chain after graduation.",
+    meta: "No insider allocation",
   },
   {
     index: "03",
     icon: <LockKeyhole size={18} />,
-    title: "Yield with substance",
-    copy: "Developers earn 0.5% of every trade. Stakers earn 0.5%, and the team earns 0.3%, all settled in NEAR by the contract.",
+    title: "Fees that pay builders",
+    copy: "Every trade pays the creator, the platform and the stakers. Real NEAR, real yield, settled by the contract.",
     meta: "Real fee-backed yield",
   },
 ];
@@ -345,8 +345,8 @@ export function HomePage() {
             Invest in the code
           </h1>
           <p className="hero-sub">
-            GitFi turns public GitHub repositories into verified utility tokens.
-            Developers earn royalties, traders price momentum, holders earn real yield.
+            Public repositories become real markets. Verified builders launch, traders price
+            the work, and every trade pays the people who ship the code.
           </p>
           <div className="hero-actions">
             <Link to="/explore" className={buttonClass("primary", "lg")}>
@@ -357,8 +357,8 @@ export function HomePage() {
             </Link>
           </div>
           <div className="hero-trust mono">
-            <span><BadgeCheck size={12} /> NO GITHUB OAUTH</span>
-            <span><GitBranch size={12} /> PUBLIC REPOS ONLY</span>
+            <span><BadgeCheck size={12} /> PROOF, NOT OAUTH</span>
+            <span><GitBranch size={12} /> PUBLIC REPOS. REAL MARKETS.</span>
           </div>
         </div>
         <div className="hero-visual">
@@ -469,7 +469,7 @@ export function HomePage() {
         <div className="mechanic-intro">
           <span className="eyebrow">A three-sided protocol</span>
           <h2 className="mechanic-title">Aligned by the<br /><em>same fee.</em></h2>
-          <p>One point three percent per trade. No hidden allocations. Creators earn royalties, stakers earn the fee yield, the team keeps the protocol running, and every fill settles on NEAR.</p>
+          <p>One point three percent per trade. No hidden allocations. Builders earn royalties, stakers earn the flow, and the protocol keeps the lights on. Every fill settles on NEAR.</p>
           <div className="fee-equation">
             <div><strong>0.50%</strong><span>creator</span></div>
             <span className="fee-plus">+</span>

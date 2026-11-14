@@ -226,7 +226,7 @@ export function SiteHeader() {
     setMobileOpen(false);
     window.scrollTo({ top: 0, behavior: "auto" });
     if (!location.pathname.startsWith("/token/") && !location.pathname.startsWith("/real/")) {
-      document.title = "GitFi.fun — Public code. Priced in public.";
+      document.title = "GitFi.fun | Public code. Priced in public.";
     }
   }, [location.pathname]);
 
@@ -317,7 +317,7 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="footer-bottom">
-        <span>© {new Date().getFullYear()} GitFi.fun — {(platform?.network ?? "testnet")} build. Trades settle on NEAR {(platform?.network ?? "testnet")}.</span>
+        <span>© {new Date().getFullYear()} GitFi.fun | {(platform?.network ?? "testnet")} build. Trades settle on NEAR {(platform?.network ?? "testnet")}.</span>
         <span className="mono">NO GITHUB OAUTH · EVER</span>
       </div>
     </footer>

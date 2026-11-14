@@ -797,7 +797,7 @@ export function OnChainMarketPage() {
 
           <p className="onchain-note">
             Wallet-signed and settled by the market contract. 1.3% fee: 0.5%
-            creator, 0.3% team, 0.5% stakers. Prices are displayed in USD using live NEAR/USD.
+            creator, 0.3% platform, 0.5% stakers. Prices are displayed in USD using live NEAR/USD.
           </p>
         </Card>
       </div>

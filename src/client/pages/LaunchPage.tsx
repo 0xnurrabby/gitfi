@@ -705,7 +705,7 @@ export function LaunchPage() {
           <Card className="launch-facts">
             <div className="side-card-head"><span className="eyebrow">The terms</span><GitPullRequest size={13} /></div>
             <div className="launch-fact"><span className="mono">01</span><div><strong>Zero free allocation</strong><p>Developers never receive tokens for free. Fair launch for every wallet, including yours.</p></div></div>
-            <div className="launch-fact"><span className="mono">02</span><div><strong>0.5% creator + 0.3% team</strong><p>Every trade pays the verified creator 0.5% and the team 0.3%, claimable from the market contract.</p></div></div>
+            <div className="launch-fact"><span className="mono">02</span><div><strong>0.5% creator + 0.3% platform</strong><p>Every trade pays the verified creator 0.5% and the platform 0.3%, claimable from the market contract.</p></div></div>
             <div className="launch-fact"><span className="mono">03</span><div><strong>Real staker yield</strong><p>0.5% of every trade is paid to token stakers in NEAR, directly by the market contract.</p></div></div>
             <div className="launch-fact"><span className="mono">04</span><div><strong>On-chain graduation</strong><p>At the curve target the curve closes; the market and reserve stay open on-chain. No fake DEX pool.</p></div></div>
           </Card>
