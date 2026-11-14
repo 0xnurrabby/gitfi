@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import nacl from "tweetnacl";
-import { JsonRpcProvider, PublicKey } from "near-api-js";
+import { PublicKey } from "near-api-js";
 import { config } from "./config.js";
 import { addSecondsIso, db, nowIso } from "./db.js";
 import { ensureUserForWallet, randomId, type UserRow } from "./auth.js";
@@ -10,14 +10,44 @@ const NEP413_TAG = 2147484061;
 const CHALLENGE_TTL_SECONDS = 10 * 60;
 const ACCOUNT_ID_RE = /^[a-z0-9](?:[a-z0-9._-]{0,62}[a-z0-9])$/;
 
-let provider: JsonRpcProvider | null = null;
+async function hasActiveAccessKey(accountId: string, publicKey: string): Promise<boolean> {
+  const endpoints = [
+    config.nearRpcUrl,
+    config.nearNetwork === "mainnet"
+      ? "https://rpc.mainnet.near.org"
+      : "https://rpc.testnet.near.org",
+  ].filter(Boolean);
 
-function rpc(): JsonRpcProvider {
-  provider ??= new JsonRpcProvider(
-    { url: config.nearRpcUrl },
-    { retries: 2, wait: 300, backoff: 1.5 },
-  );
-  return provider;
+  for (const url of [...new Set(endpoints)]) {
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: 1,
+          method: "query",
+          params: {
+            request_type: "view_access_key",
+            finality: "final",
+            account_id: accountId,
+            public_key: publicKey,
+          },
+        }),
+        signal: AbortSignal.timeout(8_000),
+      });
+      if (!response.ok) continue;
+      const payload = (await response.json()) as {
+        result?: { nonce?: number | string };
+        error?: { cause?: { name?: string } };
+      };
+      if (payload.result) return true;
+      if (payload.error?.cause?.name === "UNKNOWN_ACCESS_KEY") return false;
+    } catch {
+      // Try the next RPC endpoint.
+    }
+  }
+  return false;
 }
 
 function u32le(value: number): Buffer {
@@ -166,13 +196,8 @@ export async function verifyNearAuthChallenge(input: NearAuthInput): Promise<{
     throw new ApiError("Wallet signature could not be verified.", 401, "INVALID_SIGNATURE");
   }
 
-  try {
-    await rpc().viewAccessKey({
-      accountId,
-      publicKey: input.publicKey,
-      finalityQuery: { finality: "final" },
-    });
-  } catch {
+  const keyIsActive = await hasActiveAccessKey(accountId, input.publicKey);
+  if (!keyIsActive) {
     throw new ApiError(
       `This key is not an active access key for ${accountId} on NEAR ${challenge.network}.`,
       401,
