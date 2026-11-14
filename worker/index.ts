@@ -7,6 +7,12 @@ interface Env {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+
+    if (url.hostname.toLowerCase().startsWith("docs.")) {
+      const docsPath = url.pathname === "/" ? "/docs/" : `/docs${url.pathname}`;
+      return env.ASSETS.fetch(new Request(new URL(docsPath, url.origin), request));
+    }
+
     const proxied =
       url.pathname === "/api" ||
       url.pathname.startsWith("/api/") ||
