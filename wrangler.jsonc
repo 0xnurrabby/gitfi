@@ -11,5 +11,8 @@
   "vars": {
     "API_ORIGIN": "https://gitfi-api.onrender.com",
     "APP_ORIGIN": "https://gitfi.fun"
+  },
+  "triggers": {
+    "crons": ["*/10 * * * *"]
   }
 }

@@ -14,6 +14,7 @@ Own the work. Price the work. Let the market discover the work.
 <br />
 
 [![NEAR testnet](https://img.shields.io/badge/NEAR-testnet-c9f45d?style=flat-square&labelColor=101510)](https://explorer.testnet.near.org/accounts/market.gitfi-395012.testnet)
+[![Live testnet](https://img.shields.io/badge/live-testnet-c9f45d?style=flat-square&labelColor=101510)](https://gitfi-fun.nurrabby01-bd.workers.dev)
 [![Docs](https://img.shields.io/badge/docs-live-c9f45d?style=flat-square&labelColor=101510)](https://0xnurrabby.github.io/gitfi/)
 [![Verify](https://github.com/0xnurrabby/gitfi/actions/workflows/verify.yml/badge.svg)](https://github.com/0xnurrabby/gitfi/actions/workflows/verify.yml)
 [![License](https://img.shields.io/badge/license-MIT-101510?style=flat-square)](./LICENSE)
@@ -336,6 +337,7 @@ It covers:
 Machine-readable project summary: [`llms.txt`](./public/llms.txt)
 
 GitHub Pages preview: `https://0xnurrabby.github.io/gitfi/`  
+Live testnet app: `https://gitfi-fun.nurrabby01-bd.workers.dev`  
 Production docs target: `https://docs.gitfi.fun`
 
 ---
@@ -446,7 +448,7 @@ GitFi is an experiment in making public work legible to markets without asking b
 
 **Public code. Priced in public.**
 
-[Website](https://gitfi.fun) · [Docs](https://docs.gitfi.fun) · [Market contract](https://explorer.testnet.near.org/accounts/market.gitfi-395012.testnet) · [Proof ledger](https://gitfi.fun/proof)
+[Website](https://gitfi.fun) · [Live testnet](https://gitfi-fun.nurrabby01-bd.workers.dev) · [Docs](https://docs.gitfi.fun) · [Market contract](https://explorer.testnet.near.org/accounts/market.gitfi-395012.testnet) · [Proof ledger](https://gitfi.fun/proof)
 
 <sub>Built for the NEAR ecosystem. Testnet build. Not audited.</sub>
 

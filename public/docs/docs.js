@@ -9,9 +9,12 @@
 
   // App links work on the app host and on a future docs subdomain.
   const host = window.location.hostname;
-  const appOrigin = host === "localhost" || host === "127.0.0.1" || host.endsWith("trycloudflare.com") || host.endsWith("workers.dev")
-    ? window.location.origin
-    : "https://gitfi.fun";
+  const previewApp = "https://gitfi-fun.nurrabby01-bd.workers.dev";
+  const appOrigin = host.endsWith("github.io")
+    ? previewApp
+    : host === "localhost" || host === "127.0.0.1" || host.endsWith("trycloudflare.com") || host.endsWith("workers.dev")
+      ? window.location.origin
+      : "https://gitfi.fun";
   for (const link of document.querySelectorAll("[data-app-link]")) {
     const path = link.getAttribute("href") || "/";
     link.setAttribute("href", `${appOrigin}${path}`);
