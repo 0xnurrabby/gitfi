@@ -1,0 +1,12 @@
+node_modules
+dist
+data
+contracts
+tests
+*.log
+.git
+.env
+.env.*
+README.md
+SECURITY.md
+ECONOMICS.md

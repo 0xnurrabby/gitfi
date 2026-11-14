@@ -1,0 +1,46 @@
+# GitFi.fun
+
+> GitFi is the market layer for open source. It turns a public GitHub repository into one verified on-chain market on NEAR, with wallet-signed trading, creator royalties, team fees and staker yield.
+
+## Canonical links
+
+- App: https://gitfi.fun
+- Docs: https://docs.gitfi.fun
+- Docs mirror: https://gitfi.fun/docs/
+- Market contract: https://explorer.testnet.near.org/accounts/market.gitfi-395012.testnet
+- Repo registry: https://explorer.testnet.near.org/accounts/gitfi-395012.testnet
+
+## What GitFi does
+
+1. A builder connects a NEAR wallet with NEP-413. No GitHub OAuth is used.
+2. The builder proves ownership by adding one sync line to the public README.
+3. The builder pays a 1 NEAR launch fee directly to the team wallet.
+4. The verified repository gets exactly one token and one market on NEAR.
+5. Users buy and sell with testnet NEAR. Balances, cost basis and every trade are recorded by the market contract.
+6. The creator earns 0.5% of every trade, the team earns 0.3%, and token stakers earn 0.5%. Total trade fee: 1.3%.
+
+## Ownership rule
+
+Only the README-verified repository owner can create the token/market. One repository can have exactly one token. A second wallet cannot launch a market from someone else's repository.
+
+## What is real
+
+- NEAR testnet contracts are deployed and public.
+- Buy/sell, staking, reward claims and bounties are wallet-signed on-chain actions.
+- Home, Explore, Portfolio and Leaderboard read the market contract; market prices are displayed in USD using a live NEAR/USD quote while settlement is in NEAR.
+- There is no demo faucet, demo USDC trading path, or sandbox wallet login in the UI.
+
+## Current testnet scope
+
+- The market is a step-price market with an on-chain reserve, not a full constant-product DEX.
+- Tokens currently use an internal ledger inside the market contract, not a standalone NEP-141 contract per repository.
+- The old seeded testnet markets were removed; the active market set is intentionally clean and owner-gated.
+- Mainnet requires fresh contracts, production owner/treasury accounts, a clean database, and an external security audit.
+
+## For hackathon judges
+
+Start at https://docs.gitfi.fun/#judges for the five-minute tour: thesis, mechanism, why NEAR is load-bearing, and an honest list of what is still mainnet work.
+
+## Status
+
+Testnet build. Not audited. Contracts and docs are the source of truth.

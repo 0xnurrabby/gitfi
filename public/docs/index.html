@@ -1,0 +1,965 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="index,follow" />
+    <meta name="color-scheme" content="light dark" />
+    <title>GitFi Docs — The market layer for open source</title>
+    <meta
+      name="description"
+      content="GitFi turns public GitHub repositories into verified, tradeable on-chain markets. Read the story, protocol mechanics, fees, contracts, and the judge tour."
+    />
+    <meta property="og:title" content="GitFi Docs — The market layer for open source" />
+    <meta
+      property="og:description"
+      content="One repo, one token, one real market. Proof-of-ownership via README, NEAR settlement, live USD marks, creator royalties and staker yield."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="/favicon.svg" />
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="GitFi machine-readable summary" />
+    <link rel="stylesheet" href="./docs.css" />
+    <script>
+      try {
+        const saved = localStorage.getItem("gitfi-docs-theme");
+        if (saved === "dark" || saved === "light") document.documentElement.dataset.theme = saved;
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#introduction">Skip to content</a>
+
+    <header class="topbar">
+      <div class="topbar-inner">
+        <button class="menu-btn" id="menuButton" aria-label="Open docs navigation" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+        <a class="docs-brand" href="#introduction" aria-label="GitFi docs home">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none">
+              <path d="M16 3 28 10v12L16 29 4 22V10L16 3Z" stroke="currentColor" stroke-width="1.7" />
+              <path d="M16 10v12M10 13.5v5M22 13.5v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+            </svg>
+          </span>
+          <span class="brand-copy"><strong>GitFi.fun</strong><em>docs</em></span>
+        </a>
+        <span class="topbar-divider" aria-hidden="true"></span>
+        <span class="topbar-title">The market layer for open source</span>
+        <div class="topbar-actions">
+          <a class="judge-link" href="#judges"><span class="pulse"></span> Judge tour</a>
+          <button class="theme-btn" id="themeButton" aria-label="Toggle color theme">
+            <span class="theme-sun">☼</span><span class="theme-moon">☾</span>
+          </button>
+          <a class="app-link" href="/" data-app-link>Open app <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+    </header>
+
+    <div class="docs-shell">
+      <aside class="sidebar" id="sidebar" aria-label="Documentation navigation">
+        <div class="sidebar-inner">
+          <div class="sidebar-meta">
+            <span class="version-pill"><i></i> Testnet · v2</span>
+            <span class="sidebar-domain mono">docs.gitfi.fun</span>
+          </div>
+
+          <nav class="sidebar-nav">
+            <p class="nav-group">Start here</p>
+            <a href="#introduction" class="nav-item">Introduction</a>
+            <a href="#story" class="nav-item">The story</a>
+            <a href="#problem" class="nav-item">The problem</a>
+            <a href="#solution" class="nav-item">The solution</a>
+            <a href="#judges" class="nav-item judge-nav">For judges &amp; Claude <span>↗</span></a>
+
+            <p class="nav-group">How GitFi works</p>
+            <a href="#how-it-works" class="nav-item">The five-step flow</a>
+            <a href="#ownership" class="nav-item">Proof of ownership</a>
+            <a href="#market" class="nav-item">Market mechanics</a>
+            <a href="#fees" class="nav-item">Fees &amp; revenue</a>
+            <a href="#stars" class="nav-item">Stars &amp; momentum</a>
+            <a href="#discovery" class="nav-item">Discovery</a>
+
+            <p class="nav-group">Participants</p>
+            <a href="#builders" class="nav-item">For builders</a>
+            <a href="#traders" class="nav-item">For traders</a>
+            <a href="#stakers" class="nav-item">For stakers</a>
+
+            <p class="nav-group">Protocol</p>
+            <a href="#principles" class="nav-item">Design principles</a>
+            <a href="#vision" class="nav-item">Vision</a>
+            <a href="#architecture" class="nav-item">Architecture</a>
+            <a href="#contracts" class="nav-item">Contracts</a>
+            <a href="#security" class="nav-item">Security model</a>
+            <a href="#api" class="nav-item">API &amp; data</a>
+
+            <p class="nav-group">Reference</p>
+            <a href="#roadmap" class="nav-item">Roadmap</a>
+            <a href="#faq" class="nav-item">FAQ</a>
+            <a href="#glossary" class="nav-item">Glossary</a>
+            <a href="#links" class="nav-item">Links</a>
+          </nav>
+
+          <div class="sidebar-foot">
+            <p>Public code.<br />Priced in public.</p>
+            <a href="/" data-app-link>Launch a repository <span>→</span></a>
+          </div>
+        </div>
+      </aside>
+
+      <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+      <main class="docs-main" id="introduction">
+        <div class="hero">
+          <div class="hero-grid" aria-hidden="true"></div>
+          <div class="hero-copy">
+            <div class="eyebrow"><span class="eyebrow-line"></span> The GitFi handbook</div>
+            <h1>The market layer<br /><em>for open source.</em></h1>
+            <p class="hero-lede">
+              Every day, builders ship the tools the internet runs on — and the market rarely
+              knows their names. GitFi turns a public repository into a verified on-chain
+              market, so the work can be discovered, priced, funded and owned by the people
+              who actually use it.
+            </p>
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="/" data-app-link>Open GitFi.fun <span>↗</span></a>
+              <a class="btn btn-secondary" href="#story">Read the story</a>
+            </div>
+            <div class="hero-trust mono">
+              <span><i></i> NEAR testnet</span>
+              <span>1 repo → 1 token</span>
+              <span>1.3% trade fee</span>
+              <span>README proof, no OAuth</span>
+            </div>
+          </div>
+          <div class="hero-card" aria-label="GitFi market terminal preview">
+            <div class="terminal-top">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <span class="mono">gitfi://markets/your-repo</span>
+              <span class="terminal-live"><i></i> ON-CHAIN</span>
+            </div>
+            <div class="terminal-body">
+              <div class="terminal-asset">
+                <span class="asset-tile">GF</span>
+                <div><strong>$YOURREPO</strong><span class="mono">builder/your-repo</span></div>
+                <span class="terminal-badge">VERIFIED</span>
+              </div>
+              <div class="terminal-price">
+                <span class="mono">$0.000000</span>
+                <span class="up">↗ live USD</span>
+              </div>
+              <svg class="terminal-chart" viewBox="0 0 420 110" role="img" aria-label="Rising market chart">
+                <defs>
+                  <linearGradient id="hero-fill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#b7e42a" stop-opacity=".3" />
+                    <stop offset="1" stop-color="#b7e42a" stop-opacity="0" />
+                  </linearGradient>
+                </defs>
+                <path d="M0 95 C45 92 70 88 100 84 C140 78 155 86 190 70 C230 52 250 58 285 42 C320 26 350 30 385 18 L420 10 L420 110 L0 110 Z" fill="url(#hero-fill)" />
+                <path d="M0 95 C45 92 70 88 100 84 C140 78 155 86 190 70 C230 52 250 58 285 42 C320 26 350 30 385 18 L420 10" fill="none" stroke="#8fb51b" stroke-width="2" />
+                <circle cx="420" cy="10" r="4" fill="#8fb51b" />
+              </svg>
+              <div class="terminal-stats">
+                <div><span>MARKET CAP</span><strong class="mono">$—</strong></div>
+                <div><span>24H VOLUME</span><strong class="mono">$—</strong></div>
+                <div><span>HOLDERS</span><strong class="mono">—</strong></div>
+              </div>
+              <div class="terminal-note mono">PRICES FROM THE MARKET CONTRACT · USD VIA LIVE NEAR QUOTE</div>
+            </div>
+          </div>
+        </div>
+
+        <section class="doc-section lead-section">
+          <p class="section-kicker">Introduction</p>
+          <h2>Open source built the world. The market looked away.</h2>
+          <p class="lead">
+            GitFi is a launchpad and exchange for repositories. Not for a founder's slide deck,
+            not for a private company — for the public work that developers already ship.
+          </p>
+          <p>
+            A repository is a real asset with real users, real maintenance costs and real
+            cultural gravity. But before GitFi, the only way to “invest” in open source was to
+            star it, sponsor it, or hope the maintainer eventually built a company around it.
+            There was no market. There was no ownership layer. There was no way for a new repo
+            to be discovered by people looking for the next important piece of infrastructure.
+          </p>
+          <p>
+            GitFi fixes that with three primitives: <strong>proof of ownership</strong>,
+            <strong>a real market</strong>, and <strong>a shared fee</strong>. One repository
+            becomes exactly one token. The verified owner creates it. The market discovers it.
+            Trading settles on NEAR. The creator, the team and the people who stake the token
+            all earn from the same activity.
+          </p>
+          <div class="callout callout-accent">
+            <span class="callout-icon">✦</span>
+            <div>
+              <strong>The one-sentence version</strong>
+              <p>
+                GitFi is a permissionless, owner-verified market where public code becomes a
+                tradeable asset and the people who build it finally capture a piece of the
+                attention they create.
+              </p>
+            </div>
+          </div>
+          <div class="stat-strip">
+            <div><span>SETTLEMENT</span><strong>NEAR testnet</strong><em>real wallet-signed trades</em></div>
+            <div><span>IDENTITY</span><strong>README proof</strong><em>no GitHub OAuth</em></div>
+            <div><span>MARKET</span><strong>1 repo = 1 token</strong><em>owner-gated creation</em></div>
+            <div><span>FEES</span><strong>1.3%</strong><em>creator + team + stakers</em></div>
+          </div>
+        </section>
+
+        <section class="doc-section" id="story">
+          <p class="section-kicker">The story</p>
+          <h2>A builder can ship for years and still be invisible.</h2>
+          <p>
+            Imagine a developer who spends three years building a small database tool. It has
+            two thousand stars, a few hundred forks, and is quietly used inside companies that
+            the developer will never meet. The code is public. The impact is real. But there is
+            no market for the work, no way for a newcomer to discover it early, and no
+            feedback loop between the value of the repository and the person maintaining it.
+          </p>
+          <p>
+            The modern internet has this backwards. A project can be foundational and still
+            have no price, no ownership, no discoverable floor. Stars are a social signal, but
+            they don't pay for a server. A trending page can make a repo famous for a day, but
+            it doesn't let the people who care about it participate in the upside.
+          </p>
+          <blockquote>
+            “The next important open-source project probably exists already. It is just not
+            priced, not discoverable, and not owned by the people who believe in it.”
+          </blockquote>
+          <p>
+            GitFi begins with a simple question: what if every public repository could be
+            recognised as an asset without asking the maintainer to give up control, take
+            venture money, or rebuild their project as a company? What if recognition itself
+            became a market — and that market paid the people doing the work?
+          </p>
+          <p>
+            That is the experiment. A repository gets a deed. A token gets a market. A market
+            gets a chart, a community and a reason to care. The builder keeps the code public
+            and earns from every trade. The trader gets a real, traceable market instead of a
+            screenshot. The reader gets a way to discover code before the crowd.
+          </p>
+          <div class="pull-quote">
+            <span class="pull-mark">“</span>
+            <p>
+              Public code should be able to become an asset without becoming a company.
+            </p>
+            <span class="pull-cite mono">GITFI DESIGN PRINCIPLE / 01</span>
+          </div>
+        </section>
+
+        <section class="doc-section" id="problem">
+          <p class="section-kicker">The problem</p>
+          <h2>Four broken incentives in the open-source economy.</h2>
+          <div class="card-grid">
+            <div class="doc-card">
+              <span class="card-index mono">01</span>
+              <h3>Builders are invisible</h3>
+              <p>
+                Great repositories are buried under a feed of releases and retweets. Discovery
+                rewards marketing, not engineering. Maintainers have no direct way to turn
+                attention into sustainable funding.
+              </p>
+            </div>
+            <div class="doc-card">
+              <span class="card-index mono">02</span>
+              <h3>Attention has no ownership</h3>
+              <p>
+                Stars, forks and downloads are public signals, but nobody can own a position in
+                the work. There is no market price, no cost basis, no way to participate.
+              </p>
+            </div>
+            <div class="doc-card">
+              <span class="card-index mono">03</span>
+              <h3>Traders lack real discovery</h3>
+              <p>
+                New token launches are often disconnected from real work. There is no verifiable
+                link between the asset and the repository behind it, so due diligence becomes
+                guesswork.
+              </p>
+            </div>
+            <div class="doc-card">
+              <span class="card-index mono">04</span>
+              <h3>Platforms capture the value</h3>
+              <p>
+                The repo creates the community, the traffic and the reputation. The platform
+                captures the upside. The maintainer gets a badge and a thank-you.
+              </p>
+            </div>
+          </div>
+          <div class="callout">
+            <span class="callout-icon">→</span>
+            <div>
+              <strong>GitFi's bet</strong>
+              <p>
+                If a repository can be verified, priced and traded, then discovery becomes
+                economic. The best work can rise because people can put capital and reputation
+                behind it — not only because an algorithm decided to show it.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="doc-section" id="solution">
+          <p class="section-kicker">The solution</p>
+          <h2>One repo. One deed. One real market.</h2>
+          <p>
+            GitFi is built around three linked identities:
+          </p>
+          <div class="triad">
+            <div class="triad-card">
+              <span class="triad-num mono">01</span>
+              <h3>Repo</h3>
+              <p>A public GitHub repository. It is the source of truth, the brand and the utility.</p>
+            </div>
+            <div class="triad-card">
+              <span class="triad-num mono">02</span>
+              <h3>Deed</h3>
+              <p>An on-chain ownership record, bound to a wallet that proved README control.</p>
+            </div>
+            <div class="triad-card">
+              <span class="triad-num mono">03</span>
+              <h3>Market</h3>
+              <p>A token and a reserve on NEAR. Buy, sell, stake, claim — all wallet-signed.</p>
+            </div>
+          </div>
+          <p>
+            The repo and deed are joined by a single line the owner puts in their README. No
+            OAuth, no GitHub app permissions, no custody of a GitHub account. The deed is
+            verified against the public README and then minted on NEAR. The market is created
+            only after that proof and after the fixed 1 NEAR launch fee is paid to the team.
+          </p>
+          <div class="callout callout-warn">
+            <span class="callout-icon">!</span>
+            <div>
+              <strong>Owner-only by design</strong>
+              <p>
+                A repo can have exactly one token, and only the wallet that proved README
+                ownership can create it. A random wallet cannot launch a market from someone
+                else's repository. This is enforced in the API and in the database, not just in
+                the UI.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="doc-section" id="judges">
+          <div class="judge-banner">
+            <div>
+              <span class="mono judge-label">FOR JUDGES &amp; CLAUDE</span>
+              <h2>Five minutes to see why GitFi is different.</h2>
+              <p>
+                If you are evaluating this project, start here. This page is the fastest route
+                to the thesis, the live system and the parts that are genuinely on-chain.
+              </p>
+            </div>
+            <div class="judge-stamp">
+              <span>NEAR</span>
+              <strong>TESTNET</strong>
+              <em>real contracts · real fees</em>
+            </div>
+          </div>
+
+          <div class="judge-grid">
+            <div class="judge-item">
+              <span class="mono">01</span>
+              <div>
+                <h3>The problem is real</h3>
+                <p>
+                  Open-source builders create enormous value but have no market layer for
+                  recognition or upside. GitFi is not a generic memecoin launchpad; the asset is
+                  a verified repository with a public README and a real owner.
+                </p>
+              </div>
+            </div>
+            <div class="judge-item">
+              <span class="mono">02</span>
+              <div>
+                <h3>The mechanism is specific</h3>
+                <p>
+                  README proof → one deed → one market → wallet-signed buy/sell → creator, team
+                  and staker fees. Every number on the market page comes from the contract, not a
+                  spreadsheet or a demo ledger.
+                </p>
+              </div>
+            </div>
+            <div class="judge-item">
+              <span class="mono">03</span>
+              <div>
+                <h3>NEAR is load-bearing</h3>
+                <p>
+                  NEAR provides fast finality, low-fee trading, NEP-413 login and a clean
+                  wallet-signed transaction model. Remove NEAR and the product does not work;
+                  it is not a chain bolted onto a Web2 app.
+                </p>
+              </div>
+            </div>
+            <div class="judge-item">
+              <span class="mono">04</span>
+              <div>
+                <h3>The hard parts are honest</h3>
+                <p>
+                  This is a testnet build. It has a step-price market, an internal token ledger
+                  inside the market contract, and a mainnet checklist. The docs call those
+                  boundaries out instead of pretending they do not exist.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="judge-route">
+            <div class="judge-route-head">
+              <span class="eyebrow">Suggested route</span>
+              <span class="mono">5 MINUTES</span>
+            </div>
+            <div class="route-row">
+              <span class="mono">01</span>
+              <div><strong>Home</strong><p>Read the thesis and the fee equation.</p></div>
+              <a href="/" data-app-link>Open <span>↗</span></a>
+            </div>
+            <div class="route-row">
+              <span class="mono">02</span>
+              <div><strong>Explore</strong><p>See the owner-gated market index and discovery.</p></div>
+              <a href="/explore" data-app-link>Open <span>↗</span></a>
+            </div>
+            <div class="route-row">
+              <span class="mono">03</span>
+              <div><strong>Launch</strong><p>See the README proof, 1 NEAR fee and market setup.</p></div>
+              <a href="/launch" data-app-link>Open <span>↗</span></a>
+            </div>
+            <div class="route-row">
+              <span class="mono">04</span>
+              <div><strong>Contracts</strong><p>Inspect the registry and market on the explorer.</p></div>
+              <a href="https://explorer.testnet.near.org/accounts/market.gitfi-395012.testnet" target="_blank" rel="noreferrer">Inspect <span>↗</span></a>
+            </div>
+            <div class="route-row">
+              <span class="mono">05</span>
+              <div><strong>Proof</strong><p>Check the signed receipt ledger and deed pipeline.</p></div>
+              <a href="/proof" data-app-link>Open <span>↗</span></a>
+            </div>
+          </div>
+
+          <div class="callout callout-accent">
+            <span class="callout-icon">⌘</span>
+            <div>
+              <strong>Why this can stand out in a crowded hackathon</strong>
+              <p>
+                Most launchpad projects stop at “mint a token and draw a chart.” GitFi connects
+                the token to a real, verifiable artifact — a public repository — and makes the
+                owner prove control without OAuth. That single constraint changes the trust
+                model, the discovery model and the story. The market is not the product; the
+                repository is. The market is how the repository becomes legible to capital.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="doc-section" id="how-it-works">
+          <p class="section-kicker">How it works</p>
+          <h2>From public code to a live market in five steps.</h2>
+          <div class="steps">
+            <div class="step">
+              <span class="step-num mono">01</span>
+              <div><h3>Connect a NEAR wallet</h3><p>NEAR Connect + NEP-413. No email, no GitHub OAuth, no custodial account.</p></div>
+            </div>
+            <div class="step">
+              <span class="step-num mono">02</span>
+              <div><h3>Prove the repository</h3><p>Add a one-time sync line to the public README. GitFi verifies the raw file and binds the repo to your wallet.</p></div>
+            </div>
+            <div class="step">
+              <span class="step-num mono">03</span>
+              <div><h3>Pay the launch fee</h3><p>A wallet-signed transfer of 1 NEAR goes directly to the team address. The server verifies signer, receiver and amount before anything is created.</p></div>
+            </div>
+            <div class="step">
+              <span class="step-num mono">04</span>
+              <div><h3>Create the market</h3><p>The market contract creates the token market and its initial reserve. The creator becomes the market owner.</p></div>
+            </div>
+            <div class="step">
+              <span class="step-num mono">05</span>
+              <div><h3>Trade, stake, claim</h3><p>Buy or sell with NEAR. Stake tokens for fee yield. Claim creator fees. Fund bounties. Everything is signed by your wallet.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="doc-section" id="ownership">
+          <p class="section-kicker">Proof of ownership</p>
+          <h2>No GitHub OAuth. A cryptographic handshake through public code.</h2>
+          <p>
+            GitFi does not ask for GitHub permissions because it does not need them. Ownership
+            is proven by the one thing only the repository owner can change: the public README.
+          </p>
+          <div class="code-block">
+            <div class="code-head"><span class="mono">README.md</span><span class="mono">ONE LINE</span></div>
+            <pre><code>GitFi.fun sync ID: GF-XXXXXXXX-XXXXXXXX · wallet your-name.testnet · repo owner/repository</code></pre>
+          </div>
+          <p>
+            The server generates a one-time challenge, fetches the raw README, checks the line,
+            and stores a wallet-bound verification. The token, deed and market are created only
+            after that check. The proof is bot-resistant because a public copy of the line from
+            another repo cannot satisfy a challenge bound to your wallet, repo and nonce.
+          </p>
+          <div class="rule-grid">
+            <div><span class="mono">RULE 01</span><strong>One repo → one token</strong><p>Enforced by the database and the market contract.</p></div>
+            <div><span class="mono">RULE 02</span><strong>One owner → one deed</strong><p>A second wallet cannot claim an already-verified repo.</p></div>
+            <div><span class="mono">RULE 03</span><strong>Owner-only creation</strong><p>Another wallet cannot launch a token from your repo.</p></div>
+            <div><span class="mono">RULE 04</span><strong>No free allocation</strong><p>Creators buy from the market like everyone else.</p></div>
+          </div>
+        </section>
+
+        <section class="doc-section" id="market">
+          <p class="section-kicker">Market mechanics</p>
+          <h2>A real reserve, a step price, and a chart that tells the truth.</h2>
+          <p>
+            The deployed market is a NEAR-quoted step-price market. It is intentionally simple
+            and legible: every trade has a price, a token amount and a NEAR amount recorded
+            on-chain. The contract holds the sell reserve, tracks balances and cost basis, and
+            emits every fill for indexing.
+          </p>
+          <div class="mechanics-grid">
+            <div class="mechanic-card">
+              <span class="mono">PRICE</span>
+              <h3>Step price</h3>
+              <p>Buys move the price up by one step; sells move it down. The current price is always a contract value, not an off-chain oracle.</p>
+            </div>
+            <div class="mechanic-card">
+              <span class="mono">RESERVE</span>
+              <h3>Real NEAR liquidity</h3>
+              <p>The contract holds a reserve that pays sellers. The reserve is visible on the market page and cannot be spent by the creator.</p>
+            </div>
+            <div class="mechanic-card">
+              <span class="mono">POSITION</span>
+              <h3>Cost basis and PnL</h3>
+              <p>The contract stores each account's balance and cost. The UI shows value, average entry and PnL including fees.</p>
+            </div>
+            <div class="mechanic-card">
+              <span class="mono">DISPLAY</span>
+              <h3>USD marks, NEAR settlement</h3>
+              <p>Trading is always in NEAR. The UI converts to USD with a live NEAR/USD quote so prices and market caps are readable.</p>
+            </div>
+          </div>
+          <h3 class="subhead">What graduation means</h3>
+          <p>
+            The market has a curve supply. When the sold supply reaches the curve target, the
+            market status becomes <strong>graduated</strong>: the curve stops issuing new
+            inventory, and the existing market remains open on-chain. GitFi does not claim a
+            third-party DEX pool exists; that is a mainnet decision, not a fake feature.
+          </p>
+        </section>
+
+        <section class="doc-section" id="fees">
+          <p class="section-kicker">Fees &amp; revenue</p>
+          <h2>One market. Three participants. One point three percent.</h2>
+          <div class="fee-table">
+            <div class="fee-head"><span>FLOW</span><span>RECIPIENT</span><span>SHARE</span><span>HOW</span></div>
+            <div class="fee-row"><span>Token launch</span><strong>Team</strong><span class="mono">1 NEAR</span><span>Wallet transfer before creation</span></div>
+            <div class="fee-row"><span>Every trade</span><strong>Creator</strong><span class="mono">0.50%</span><span>Accrues on-chain; creator claims</span></div>
+            <div class="fee-row"><span>Every trade</span><strong>Team</strong><span class="mono">0.30%</span><span>Accrues on-chain; team claims</span></div>
+            <div class="fee-row"><span>Every trade</span><strong>Stakers</strong><span class="mono">0.50%</span><span>Pro-rata fee yield, paid in NEAR</span></div>
+            <div class="fee-row fee-total"><span>Every trade</span><strong>Total</strong><span class="mono">1.30%</span><span>Creator + team + stakers</span></div>
+          </div>
+          <div class="callout">
+            <span class="callout-icon">i</span>
+            <div>
+              <strong>If nobody stakes</strong>
+              <p>
+                The staker share has no recipient yet. In that case it remains in the market
+                contract as team/platform revenue until staking exists. The moment users stake,
+                the 0.5% fee yield flows to them proportionally.
+              </p>
+            </div>
+          </div>
+          <p class="small">
+            Fees are testnet values in this build. The creator and team shares are claimable
+            from the market contract; staking rewards are claimable in NEAR. Fees never depend
+            on a centralized order book or a hidden spreadsheet.
+          </p>
+        </section>
+
+        <section class="doc-section" id="stars">
+          <p class="section-kicker">Stars &amp; momentum</p>
+          <h2>Stars are a signal of belief. They are not a payout.</h2>
+          <p>
+            GitHub stars are the open-source world's most familiar reputation signal. GitFi
+            indexes stars, forks, commit activity and star velocity as <strong>discovery
+            inputs</strong>. A repo with rising stars gets more visibility because more people
+            are paying attention to the work.
+          </p>
+          <div class="star-flow">
+            <div><span class="mono">01</span><strong>Better repo</strong><p>Useful code attracts users.</p></div>
+            <span class="flow-arrow">→</span>
+            <div><span class="mono">02</span><strong>More stars</strong><p>Public proof of attention.</p></div>
+            <span class="flow-arrow">→</span>
+            <div><span class="mono">03</span><strong>More discovery</strong><p>Seed → Rising → Viral visibility.</p></div>
+            <span class="flow-arrow">→</span>
+            <div><span class="mono">04</span><strong>More market interest</strong><p>Traders find the work earlier.</p></div>
+          </div>
+          <p>
+            Stars do <strong>not</strong> mint tokens, create yield or guarantee a price. They
+            are a credibility layer. The market price is determined by actual buys and sells,
+            and the repository's real GitHub metadata is shown next to the market so users can
+            judge the work for themselves.
+          </p>
+          <div class="tier-table">
+            <div class="tier-row tier-head"><span>TIER</span><span>GITHUB STARS</span><span>WHY IT MATTERS</span></div>
+            <div class="tier-row"><span class="tier-tag seed">Seed</span><span>0–499</span><span>Fresh gems; earliest discovery.</span></div>
+            <div class="tier-row"><span class="tier-tag rising">Rising</span><span>500–9,999</span><span>Growing signal; more visibility.</span></div>
+            <div class="tier-row"><span class="tier-tag viral">Viral</span><span>10,000+</span><span>Major mindshare; top-of-feed gravity.</span></div>
+          </div>
+        </section>
+
+        <section class="doc-section" id="discovery">
+          <p class="section-kicker">Discovery</p>
+          <h2>A market index built for finding code before the crowd.</h2>
+          <div class="discovery-grid">
+            <div class="discovery-card">
+              <span class="mono">HOME</span>
+              <h3>Trending terminal</h3>
+              <p>The top ten markets by real on-chain volume, with live price, market cap, holders and a chart.</p>
+            </div>
+            <div class="discovery-card">
+              <span class="mono">EXPLORE</span>
+              <h3>Search &amp; filters</h3>
+              <p>Filter by tier, sort by volume, market cap, progress or stars, and search by repo or ticker.</p>
+            </div>
+            <div class="discovery-card">
+              <span class="mono">PORTFOLIO</span>
+              <h3>Your on-chain book</h3>
+              <p>Positions, average entry, USD value, PnL, staking rewards and recent fills from the contract.</p>
+            </div>
+            <div class="discovery-card">
+              <span class="mono">LEADERBOARD</span>
+              <h3>Real traders</h3>
+              <p>Ranked from on-chain volume and PnL, not XP points handed out by a database.</p>
+            </div>
+          </div>
+          <p>
+            Every market card links to a single real market page. There is no second price
+            hidden in a different index, no fake 24h volume and no demo balance. If the contract
+            has no trade, the chart says so. If a new token has one trade, the chart shows it.
+          </p>
+        </section>
+
+        <section class="doc-section" id="builders">
+          <p class="section-kicker">For builders</p>
+          <h2>Keep the code public. Keep the upside.</h2>
+          <div class="two-col">
+            <div>
+              <h3>What you get</h3>
+              <ul class="check-list">
+                <li>One verified Repo NFT / deed tied to your wallet.</li>
+                <li>A real NEAR market for your repository.</li>
+                <li>0.5% of every trade, claimable from the contract.</li>
+                <li>A public market page that makes your repo legible to traders.</li>
+                <li>Control: no free allocation and no forced token sale.</li>
+              </ul>
+            </div>
+            <div>
+              <h3>What GitFi does not do</h3>
+              <ul class="x-list">
+                <li>It does not take custody of your GitHub account.</li>
+                <li>It does not let another wallet launch your repo.</li>
+                <li>It does not mint you free tokens.</li>
+                <li>It does not promise a price or a DEX pool.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="cta-panel">
+            <div><span class="eyebrow">For builders</span><h3>Your repo is worth more than stars.</h3><p>Prove ownership, launch a market and let the market discover the work.</p></div>
+            <a class="btn btn-primary" href="/launch" data-app-link>Launch a repository <span>↗</span></a>
+          </div>
+        </section>
+
+        <section class="doc-section" id="traders">
+          <p class="section-kicker">For traders</p>
+          <h2>Trade the work, not a screenshot.</h2>
+          <p>
+            GitFi markets are tied to a public repository, a verified owner and an on-chain
+            trade history. The market page shows the contract address, the creator, the reserve,
+            the holders and every fill. Trading is wallet-signed; the chart is built from the
+            same fills.
+          </p>
+          <div class="metric-row">
+            <div><span>ENTRY</span><strong>Wallet-signed</strong><em>your keys, your trade</em></div>
+            <div><span>PRICE</span><strong>On-chain</strong><em>step market</em></div>
+            <div><span>VALUE</span><strong>USD display</strong><em>live NEAR quote</em></div>
+            <div><span>FEE</span><strong>1.3%</strong><em>transparent split</em></div>
+          </div>
+          <p>
+            The position card uses the contract's cost basis, not a local approximation. PnL
+            includes fees. If the market has a single trade, the chart shows that trade rather
+            than pretending there is no history. This is intentionally boring in the right
+            places: real balances, real fills, real reserve.
+          </p>
+        </section>
+
+        <section class="doc-section" id="stakers">
+          <p class="section-kicker">For stakers</p>
+          <h2>Back the repo. Earn the fee flow.</h2>
+          <p>
+            Staking is how holders become part of the market's economics. Stake tokens and
+            receive a pro-rata share of 0.5% of every trade. Rewards accrue on-chain and are
+            claimed in NEAR; there is no lock and no emissions schedule.
+          </p>
+          <div class="flow-panel">
+            <div><span class="mono">STAKE</span><p>Lock tokens in the market contract.</p></div>
+            <span class="flow-arrow">→</span>
+            <div><span class="mono">TRADE</span><p>Every buy and sell adds 0.5% to the staker pool.</p></div>
+            <span class="flow-arrow">→</span>
+            <div><span class="mono">ACCRUE</span><p>Your share grows with the market's activity.</p></div>
+            <span class="flow-arrow">→</span>
+            <div><span class="mono">CLAIM</span><p>Withdraw NEAR whenever you want.</p></div>
+          </div>
+          <p class="small">
+            Staking does not guarantee a return. If trading slows, rewards slow. Yield is
+            funded by fees, not by inflation or a treasury promise.
+          </p>
+        </section>
+
+        <section class="doc-section" id="principles">
+          <p class="section-kicker">Design principles</p>
+          <h2>Four rules we refuse to trade away.</h2>
+          <div class="rule-grid">
+            <div><span class="mono">01</span><strong>Proof over permission</strong><p>A public README is enough. We do not ask for OAuth, passwords or platform approval to recognise ownership.</p></div>
+            <div><span class="mono">02</span><strong>One repo, one market</strong><p>Scarcity is what makes the asset legible. A second wallet cannot clone a verified repo into another token.</p></div>
+            <div><span class="mono">03</span><strong>Real settlement</strong><p>Balances, trades, reserves, staking and bounties are on NEAR. The interface may be pretty; the accounting is not a mock.</p></div>
+            <div><span class="mono">04</span><strong>Honest boundaries</strong><p>If something is testnet, internal-ledger or not audited, the docs say so. Trust grows from clarity, not from pretending.</p></div>
+          </div>
+        </section>
+
+        <section class="doc-section" id="vision">
+          <p class="section-kicker">Vision</p>
+          <h2>A world where every repository can find its market.</h2>
+          <p>
+            There are hundreds of millions of public repositories. Most will never become a
+            company. That does not mean they have no value. It means the value is trapped in a
+            format the market cannot read.
+          </p>
+          <p>
+            GitFi is a translation layer. It turns a repository into a deed, a deed into a
+            market, and a market into a reason for the world to pay attention to the work.
+            The long-term vision is not “a token for every repo.” It is a discovery and
+            ownership layer for open source, where the best work can be recognised early and
+            the people who maintain it can keep building.
+          </p>
+          <div class="stat-strip">
+            <div><span>TODAY</span><strong>Owner-verified testnet markets</strong><em>real contracts, real fees</em></div>
+            <div><span>NEXT</span><strong>Mainnet + audits</strong><em>production treasury and indexer</em></div>
+            <div><span>LATER</span><strong>Standalone token contracts</strong><em>optional NEP-141 per repo</em></div>
+            <div><span>ALWAYS</span><strong>Public code first</strong><em>no OAuth, no gatekeeping</em></div>
+          </div>
+        </section>
+
+        <section class="doc-section" id="architecture">
+          <p class="section-kicker">Architecture</p>
+          <h2>A small stack with a clear trust boundary.</h2>
+          <div class="arch-diagram" role="img" aria-label="GitFi architecture diagram">
+            <div class="arch-node">
+              <span class="mono">CLIENT</span>
+              <strong>React + Vite</strong>
+              <p>Market pages, charts, wallet flow, docs</p>
+            </div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-node">
+              <span class="mono">API</span>
+              <strong>Express + SQLite</strong>
+              <p>Repo metadata, README proof, indexer</p>
+            </div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-node arch-chain">
+              <span class="mono">NEAR</span>
+              <strong>Registry + Market</strong>
+              <p>Deeds, balances, trades, staking, bounties</p>
+            </div>
+          </div>
+          <div class="arch-notes">
+            <div><strong>Settlement</strong><p>Balances, trades and fees live in the market contract. The server indexes and displays; it does not hold user funds.</p></div>
+            <div><strong>Identity</strong><p>NEP-413 wallet login. README proof binds a repo to a wallet. No GitHub OAuth token is ever requested.</p></div>
+            <div><strong>Index</strong><p>SQLite stores repo metadata, challenges, receipts and UI cache. Market numbers are read from the contract.</p></div>
+          </div>
+        </section>
+
+        <section class="doc-section" id="contracts">
+          <p class="section-kicker">Contracts</p>
+          <h2>Deployed on NEAR testnet.</h2>
+          <div class="contract-grid">
+            <div class="contract-card">
+              <div class="contract-head"><span class="mono">REPO REGISTRY</span><span class="status-dot"></span></div>
+              <a class="contract-address mono" href="https://explorer.testnet.near.org/accounts/gitfi-395012.testnet" target="_blank" rel="noreferrer">gitfi-395012.testnet <span>↗</span></a>
+              <p>Repo NFT deeds, oracle-gated mint/claim, freeze controls and receipt anchors.</p>
+            </div>
+            <div class="contract-card">
+              <div class="contract-head"><span class="mono">GITFI MARKET</span><span class="status-dot"></span></div>
+              <a class="contract-address mono" href="https://explorer.testnet.near.org/accounts/market.gitfi-395012.testnet" target="_blank" rel="noreferrer">market.gitfi-395012.testnet <span>↗</span></a>
+              <p>Markets, reserves, balances, cost basis, trades, 1.3% fee split, staking, bounties.</p>
+            </div>
+          </div>
+          <h3 class="subhead">Market methods</h3>
+          <div class="method-table">
+            <div><code>create_market</code><span>Owner seeds a market and reserve.</span></div>
+            <div><code>buy(token_id)</code><span>Attached NEAR, 1.3% fee, token balance, step price.</span></div>
+            <div><code>sell(token_id, amount)</code><span>Burns internal tokens, pays NEAR from reserve.</span></div>
+            <div><code>stake / unstake</code><span>Move tokens into/out of fee-yield staking.</span></div>
+            <div><code>claim_staking_rewards</code><span>Claim accrued NEAR rewards.</span></div>
+            <div><code>create_bounty</code><span>Escrow a NEAR reward on-chain.</span></div>
+            <div><code>approve_bounty / cancel_bounty</code><span>Pay the winner or refund the creator.</span></div>
+            <div><code>claim_developer_fees</code><span>Creator claims 0.5% royalties.</span></div>
+            <div><code>claim_platform_fees</code><span>Team claims 0.3% share.</span></div>
+          </div>
+          <p class="small">
+            The market currently uses an internal token ledger (balances inside the market
+            contract), not a standalone NEP-141 contract per repository. That is a deliberate
+            testnet scope decision, documented in the roadmap.
+          </p>
+        </section>
+
+        <section class="doc-section" id="security">
+          <p class="section-kicker">Security model</p>
+          <h2>What is verified, what is trusted, what is still a boundary.</h2>
+          <div class="security-list">
+            <div><span class="mono">01</span><strong>README proof is one-time and wallet-bound</strong><p>A challenge is tied to a repo, wallet and nonce; replaying another project's line does not pass.</p></div>
+            <div><span class="mono">02</span><strong>Owner-only market creation</strong><p>Only the verified wallet can create a token. Another wallet cannot launch someone else's repo.</p></div>
+            <div><span class="mono">03</span><strong>Real on-chain balances</strong><p>Buys, sells, stakes and claims are wallet-signed contract calls. The server cannot move user funds.</p></div>
+            <div><span class="mono">04</span><strong>Reserve isolation</strong><p>The sell reserve, creator fees, staking pool and bounty escrow are tracked separately in the contract.</p></div>
+            <div><span class="mono">05</span><strong>Checked math</strong><p>All market arithmetic uses integer math with explicit bounds; fee splits are computed on-chain.</p></div>
+            <div><span class="mono">06</span><strong>Not audited yet</strong><p>This is a testnet build. A mainnet deployment needs an external audit and a production owner/treasury setup.</p></div>
+          </div>
+        </section>
+
+        <section class="doc-section" id="api">
+          <p class="section-kicker">API &amp; data</p>
+          <h2>Every public number has a route.</h2>
+          <div class="api-table">
+            <div><code>GET /api/home</code><span>On-chain market index, stats, activity, leaderboard.</span></div>
+            <div><code>GET /api/tokens</code><span>Explore/search/filter/sort markets.</span></div>
+            <div><code>GET /api/onchain/market/:tokenId</code><span>Market, chart points, trades, holders, bounties, your position.</span></div>
+            <div><code>GET /api/onchain/account/:accountId</code><span>Real wallet NEAR balance + USD value.</span></div>
+            <div><code>POST /api/tokens</code><span>Owner-only launch; requires a verified 1 NEAR payment tx.</span></div>
+            <div><code>GET /api/proof</code><span>Ledger status and signed receipts.</span></div>
+          </div>
+          <p class="small">
+            The app uses the same API it documents. There is no separate “demo mode” data path
+            for the market pages. If the contract returns no markets, the UI says no markets.
+          </p>
+        </section>
+
+        <section class="doc-section" id="roadmap">
+          <p class="section-kicker">Roadmap</p>
+          <h2>What is live now, and what mainnet requires.</h2>
+          <div class="roadmap">
+            <div class="roadmap-col">
+              <span class="mono road-live">LIVE NOW · TESTNET</span>
+              <ul class="check-list">
+                <li>Wallet login with NEP-413</li>
+                <li>README ownership proof</li>
+                <li>Repo registry + market contracts</li>
+                <li>Owner-only token creation + 1 NEAR fee</li>
+                <li>Wallet-signed buy/sell + 1.3% fee split</li>
+                <li>Staking, rewards, bounties</li>
+                <li>On-chain discovery, portfolio, leaderboard</li>
+                <li>Docs, proof ledger, explorer links</li>
+              </ul>
+            </div>
+            <div class="roadmap-col">
+              <span class="mono road-next">NEXT · MAINNET</span>
+              <ul class="list">
+                <li>Fresh production registry + market deployment</li>
+                <li>Production owner/treasury + operational keys</li>
+                <li>External security audit</li>
+                <li>Optional standalone NEP-141 token per repo</li>
+                <li>DEX graduation adapter or a clear product decision</li>
+                <li>Production indexer for trade history</li>
+                <li>Mainnet launch checklist and monitoring</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="doc-section" id="faq">
+          <p class="section-kicker">FAQ</p>
+          <h2>Questions people actually ask.</h2>
+          <div class="faq-list">
+            <details open>
+              <summary>Is this a real market or a demo?</summary>
+              <p>It is a real NEAR testnet market. Wallet-signed trades settle in the market contract. The testnet build is reset to an empty market state; the old seeded tokens were removed. USD values are display-only and use a live NEAR/USD quote; settlement is in NEAR.</p>
+            </details>
+            <details>
+              <summary>Can someone else launch a token from my repo?</summary>
+              <p>No. A repository can have one token, and only the wallet that proved README ownership can create it. The API rejects other wallets and the database enforces a single token per repo.</p>
+            </details>
+            <details>
+              <summary>Do you need my GitHub password or OAuth?</summary>
+              <p>No. GitFi only reads the public README. Ownership is proven by adding one temporary sync line. There is no GitHub login, no app installation and no access token.</p>
+            </details>
+            <details>
+              <summary>How much does it cost to launch?</summary>
+              <p>1 NEAR, paid directly to the team wallet with a wallet-signed transfer. The server verifies the transaction before creating the market. The payment transaction cannot be reused.</p>
+            </details>
+            <details>
+              <summary>What does the 1.3% trade fee pay for?</summary>
+              <p>0.5% to the token creator, 0.3% to the team, and 0.5% to token stakers. Creator and team shares accrue on-chain; staking rewards are pro-rata and claimable in NEAR.</p>
+            </details>
+            <details>
+              <summary>Do GitHub stars create tokens or yield?</summary>
+              <p>No. Stars are a discovery and credibility signal. They influence tier visibility (Seed, Rising, Viral) and help traders judge the repository, but they do not mint tokens, create yield or guarantee a price.</p>
+            </details>
+            <details>
+              <summary>Why are prices shown in USD if trading is in NEAR?</summary>
+              <p>NEAR is the settlement asset. USD is a familiar display layer powered by a live NEAR/USD quote. The contract always records NEAR amounts and token balances.</p>
+            </details>
+            <details>
+              <summary>Is the token a NEP-141 contract?</summary>
+              <p>Not yet. This testnet build keeps balances inside the market contract. Standalone NEP-141 tokens are on the mainnet roadmap; the docs do not pretend otherwise.</p>
+            </details>
+          </div>
+        </section>
+
+        <section class="doc-section" id="glossary">
+          <p class="section-kicker">Glossary</p>
+          <h2>Plain-language glossary.</h2>
+          <div class="glossary-grid">
+            <div><strong>Repo deed</strong><p>The on-chain proof that a wallet controls a repository.</p></div>
+            <div><strong>Settlement</strong><p>The asset that actually moves when you trade. Here: NEAR.</p></div>
+            <div><strong>Reserve</strong><p>NEAR held by the market contract to pay sellers.</p></div>
+            <div><strong>Step price</strong><p>A price that moves by a fixed increment after each buy or sell.</p></div>
+            <div><strong>Cost basis</strong><p>The amount you paid for your current token position, tracked on-chain.</p></div>
+            <div><strong>PnL</strong><p>Profit and loss: current value minus cost basis.</p></div>
+            <div><strong>Staker</strong><p>A holder who locks tokens in the market to earn fee yield.</p></div>
+            <div><strong>Graduation</strong><p>The point where the curve stops issuing new inventory; the market stays open.</p></div>
+            <div><strong>README proof</strong><p>A one-line challenge in a public README that proves repo control.</p></div>
+            <div><strong>NEP-413</strong><p>A NEAR standard for wallet-signed authentication messages.</p></div>
+          </div>
+        </section>
+
+        <section class="doc-section" id="links">
+          <p class="section-kicker">Links</p>
+          <h2>Start here.</h2>
+          <div class="link-grid">
+            <a class="link-card" href="/" data-app-link><span class="mono">APP</span><strong>GitFi.fun</strong><span>Launch, trade and explore <b>↗</b></span></a>
+            <a class="link-card" href="/explore" data-app-link><span class="mono">MARKETS</span><strong>Explore</strong><span>Find a repository <b>↗</b></span></a>
+            <a class="link-card" href="/launch" data-app-link><span class="mono">BUILDERS</span><strong>Launch a repo</strong><span>Prove ownership <b>↗</b></span></a>
+            <a class="link-card" href="https://explorer.testnet.near.org/accounts/market.gitfi-395012.testnet" target="_blank" rel="noreferrer"><span class="mono">NEAR</span><strong>Market contract</strong><span>Inspect on explorer <b>↗</b></span></a>
+            <a class="link-card" href="/proof" data-app-link><span class="mono">TRUST</span><strong>Proof ledger</strong><span>Verify receipts <b>↗</b></span></a>
+            <a class="link-card" href="#judges"><span class="mono">JUDGES</span><strong>Judge tour</strong><span>Five-minute overview <b>↗</b></span></a>
+          </div>
+        </section>
+
+        <footer class="docs-footer">
+          <div>
+            <strong>GitFi.fun</strong>
+            <span class="mono">Public code. Priced in public.</span>
+          </div>
+          <div class="footer-links">
+            <a href="/" data-app-link>App</a>
+            <a href="/explore" data-app-link>Markets</a>
+            <a href="/launch" data-app-link>Launch</a>
+            <a href="https://explorer.testnet.near.org/accounts/market.gitfi-395012.testnet" target="_blank" rel="noreferrer">Explorer ↗</a>
+          </div>
+          <p class="mono footer-fine">TESTNET BUILD · NOT AUDITED · DOCS v2</p>
+        </footer>
+      </main>
+    </div>
+
+    <script src="./docs.js"></script>
+  </body>
+</html>

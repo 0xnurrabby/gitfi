@@ -1,0 +1,14 @@
+node_modules
+dist
+data
+.env
+.env.*
+!.env.example
+.env.local
+*.log
+*.db
+*.sqlite
+*.sqlite3
+.DS_Store
+contracts/target
+data-test

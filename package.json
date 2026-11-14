@@ -1,0 +1,83 @@
+{
+  "name": "gitfi.fun",
+  "version": "1.0.0",
+  "private": true,
+  "description": "GitFi.fun - public repositories, turned into verifiable on-chain markets on NEAR.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/0xnurrabby/gitfi.git"
+  },
+  "homepage": "https://docs.gitfi.fun",
+  "bugs": {
+    "url": "https://github.com/0xnurrabby/gitfi/issues"
+  },
+  "keywords": [
+    "near",
+    "near-protocol",
+    "defi",
+    "open-source",
+    "github",
+    "launchpad",
+    "token",
+    "market"
+  ],
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c cyan,magenta \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:api": "tsx watch src/server/index.ts",
+    "dev:web": "vite",
+    "build": "tsc -p tsconfig.server.json --noEmit && tsc -p tsconfig.json --noEmit && vite build",
+    "start": "cross-env NODE_ENV=production tsx src/server/index.ts",
+    "seed": "tsx src/server/index.ts --seed-only",
+    "seed:reset": "tsx scripts/reset.ts",
+    "typecheck": "tsc -p tsconfig.server.json --noEmit && tsc -p tsconfig.json --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "test:visual": "node scripts/visual-check.mjs",
+    "test:smoke": "node scripts/smoke.mjs",
+    "verify": "npm run typecheck && npm test && npm run build"
+  },
+  "dependencies": {
+    "@fontsource-variable/geist": "^5.2.8",
+    "@fontsource-variable/geist-mono": "^5.2.7",
+    "@hot-labs/near-connect": "^0.12.0",
+    "@tanstack/react-query": "^5.90.5",
+    "clsx": "^2.1.1",
+    "compression": "^1.8.1",
+    "cookie-parser": "^1.4.7",
+    "cross-env": "^10.1.0",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.2.0",
+    "helmet": "^8.1.0",
+    "lucide-react": "^0.552.0",
+    "near-api-js": "^7.5.3",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-markdown": "^10.1.0",
+    "react-router-dom": "^7.9.5",
+    "rehype-sanitize": "^6.0.0",
+    "remark-gfm": "^4.0.1",
+    "sharp": "^0.34.4",
+    "tsx": "^4.23.15",
+    "tweetnacl": "^1.0.3",
+    "ws": "^8.18.3",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/compression": "^1.8.1",
+    "@types/cookie-parser": "^1.4.9",
+    "@types/express": "^5.0.5",
+    "@types/node": "^24.10.0",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@types/ws": "^8.18.1",
+    "@vitejs/plugin-react": "^5.1.0",
+    "concurrently": "^9.2.1",
+    "playwright": "^1.65.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.12"
+  }
+}
