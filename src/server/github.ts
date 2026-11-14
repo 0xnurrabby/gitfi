@@ -4,6 +4,9 @@ import { db, nowIso } from "./db.js";
 import { REPO_REGEX } from "../shared/constants.js";
 import { tierForStars, type Tier } from "../shared/economics.js";
 
+const MIN_REPO_AGE_MS = 60 * 60 * 1000;
+const MIN_REPO_AGE_LABEL = "1 hour";
+
 export class GithubError extends Error {
   status: number;
   code: string;
@@ -328,11 +331,11 @@ async function loadGithubRepoFromHtml(
       "",
     ) ?? null;
   const pushedAt = (await latestCommitAt(fullName, branch)) ?? new Date().toISOString();
-  const createdDays = (Date.now() - new Date(createdAt).getTime()) / 86_400_000;
+  const createdMs = Date.now() - new Date(createdAt).getTime();
   const pushedDays = (Date.now() - new Date(pushedAt).getTime()) / 86_400_000;
-  if (createdDays < 1) {
+  if (createdMs < MIN_REPO_AGE_MS) {
     throw new GithubError(
-      "Repositories must be at least 24 hours old before they can be indexed.",
+      `Repositories must be at least ${MIN_REPO_AGE_LABEL} old before they can be indexed.`,
       422,
       "REPO_TOO_NEW",
     );
@@ -601,9 +604,9 @@ export async function loadGithubRepo(
       "REPO_INACTIVE",
     );
   }
-  if (Date.now() - new Date(repo.created_at).getTime() < 86_400_000) {
+  if (Date.now() - new Date(repo.created_at).getTime() < MIN_REPO_AGE_MS) {
     throw new GithubError(
-      "Repositories must be at least 24 hours old before they can be indexed.",
+      `Repositories must be at least ${MIN_REPO_AGE_LABEL} old before they can be indexed.`,
       422,
       "REPO_TOO_NEW",
     );
