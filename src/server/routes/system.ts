@@ -19,6 +19,7 @@ import { syncDueRepos } from "../star.js";
 import { claimLimiter, writeLimiter } from "../security.js";
 import { chainStatus, latestChainTxsForSubject, recentChainTxs } from "../chain.js";
 import { getOnChainMarket, getAccountNearBalance } from "../onchain.js";
+import { keyCheckTrace } from "../near-auth.js";
 
 export const systemRouter = Router();
 
@@ -30,6 +31,7 @@ systemRouter.get("/health", (_req, res) => {
     paused: isPaused(),
     time: nowIso(),
     version: "1.0.0",
+    keyCheck: keyCheckTrace,
   });
 });
 
