@@ -11,7 +11,9 @@
   },
   "vars": {
     "API_ORIGIN": "https://gitfi-api.onrender.com",
-    "APP_ORIGIN": "https://gitfi.fun"
+    "APP_ORIGIN": "https://gitfi.fun",
+    "NEAR_RPC_URL": "https://rpc.testnet.fastnear.com",
+    "NEAR_RPC_FALLBACK_URL": "https://rpc.testnet.near.org"
   },
   "triggers": {
     "crons": ["*/10 * * * *"]

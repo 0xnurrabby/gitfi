@@ -52,6 +52,8 @@ export const config = {
       : (process.env.NEAR_NETWORK ?? "testnet") === "testnet"
         ? "https://rpc.testnet.fastnear.com"
         : "http://localhost:3030"),
+  nearRpcProxyUrl: process.env.NEAR_RPC_PROXY_URL ?? "",
+  nearRpcProxyToken: process.env.NEAR_RPC_PROXY_TOKEN ?? "",
   nearExplorerUrl:
     process.env.NEAR_EXPLORER_URL ??
     ((process.env.NEAR_NETWORK ?? "testnet") === "mainnet"

@@ -64,11 +64,15 @@ TEAM_ADDRESS=gitfi-395012.testnet
 LAUNCH_FEE_YOCTO=1000000000000000000000000
 NEAR_CHAIN_ENABLED=true
 NEAR_RPC_URL=https://rpc.testnet.fastnear.com
+NEAR_RPC_PROXY_URL=https://gitfi.fun/rpc
+NEAR_RPC_PROXY_TOKEN=...
 NEAR_EXPLORER_URL=https://explorer.testnet.near.org
 NEAR_AUTH_RECIPIENT=gitfi.fun
 ```
 
 The operator key is required for repo deed mints, market creation and on-chain owner updates. Treat it as a production secret and rotate it before mainnet.
+
+`NEAR_RPC_PROXY_URL` points at the Worker RPC relay. It keeps backend reads and oracle transactions off Render's shared egress IP, which public NEAR RPC endpoints rate-limit. Set `NEAR_RPC_PROXY_TOKEN` to the same value as the Worker's `RPC_PROXY_TOKEN` secret. Direct `NEAR_RPC_URL` stays as a fallback.
 
 Render URL: `https://gitfi-api.onrender.com`
 
@@ -82,6 +86,14 @@ npx wrangler deploy
 ```
 
 Set `API_ORIGIN` in `wrangler.jsonc` to the Render URL.
+
+The Worker also exposes a private JSON-RPC relay at `/rpc` for the backend. Create its shared secret once:
+
+```bash
+npx wrangler secret put RPC_PROXY_TOKEN
+```
+
+The secret must match `NEAR_RPC_PROXY_TOKEN` on Render.
 
 The Worker serves:
 

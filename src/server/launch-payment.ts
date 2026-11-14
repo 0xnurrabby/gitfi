@@ -1,6 +1,7 @@
 import { config } from "./config.js";
 import { db, nowIso } from "./db.js";
 import { GithubError } from "./github.js";
+import { rpcTargets } from "./rpc.js";
 
 interface TxAction {
   Transfer?: { deposit?: string };
@@ -18,19 +19,6 @@ interface TxResponse {
     };
   };
   error?: { message?: string; data?: unknown };
-}
-
-function rpcUrls(): string[] {
-  return [
-    ...new Set(
-      [
-        config.nearRpcUrl,
-        config.nearNetwork === "mainnet"
-          ? "https://rpc.mainnet.near.org"
-          : "https://rpc.testnet.near.org",
-      ].filter(Boolean),
-    ),
-  ];
 }
 
 export interface VerifiedLaunchPayment {
@@ -67,11 +55,11 @@ export async function verifyLaunchPayment(
   }
 
   let lastError: Error | null = null;
-  for (const url of rpcUrls()) {
+  for (const target of rpcTargets()) {
     try {
-      const response = await fetch(url, {
+      const response = await fetch(target.url, {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: { "content-type": "application/json", ...target.headers },
         body: JSON.stringify({
           jsonrpc: "2.0",
           id: 1,

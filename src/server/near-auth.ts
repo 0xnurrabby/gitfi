@@ -5,35 +5,18 @@ import { config } from "./config.js";
 import { addSecondsIso, db, nowIso } from "./db.js";
 import { ensureUserForWallet, randomId, type UserRow } from "./auth.js";
 import { ApiError } from "./http.js";
+import { rpcTargets } from "./rpc.js";
 
 const NEP413_TAG = 2147484061;
 const CHALLENGE_TTL_SECONDS = 10 * 60;
 const ACCOUNT_ID_RE = /^[a-z0-9](?:[a-z0-9._-]{0,62}[a-z0-9])$/;
 
-export const keyCheckTrace: Array<{
-  url: string;
-  status?: number;
-  error?: string;
-  hasResult?: boolean;
-  rpcError?: string;
-}> = [];
-
 async function hasActiveAccessKey(accountId: string, publicKey: string): Promise<boolean> {
-  const endpoints = [
-    config.nearRpcUrl,
-    config.nearNetwork === "mainnet"
-      ? "https://rpc.mainnet.near.org"
-      : "https://rpc.testnet.near.org",
-  ].filter(Boolean);
-
-  keyCheckTrace.length = 0;
-  for (const url of [...new Set(endpoints)]) {
-    const attempt: (typeof keyCheckTrace)[number] = { url };
-    keyCheckTrace.push(attempt);
+  for (const target of rpcTargets()) {
     try {
-      const response = await fetch(url, {
+      const response = await fetch(target.url, {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: { "content-type": "application/json", ...target.headers },
         body: JSON.stringify({
           jsonrpc: "2.0",
           id: 1,
@@ -47,18 +30,15 @@ async function hasActiveAccessKey(accountId: string, publicKey: string): Promise
         }),
         signal: AbortSignal.timeout(8_000),
       });
-      attempt.status = response.status;
       if (!response.ok) continue;
       const payload = (await response.json()) as {
         result?: { nonce?: number | string };
         error?: { cause?: { name?: string } };
       };
-      attempt.hasResult = Boolean(payload.result);
-      attempt.rpcError = payload.error?.cause?.name ?? (payload.error ? "unknown" : undefined);
       if (payload.result) return true;
       if (payload.error?.cause?.name === "UNKNOWN_ACCESS_KEY") return false;
-    } catch (error) {
-      attempt.error = error instanceof Error ? error.message : String(error);
+    } catch {
+      // Try the next RPC endpoint.
     }
   }
   return false;

@@ -3,15 +3,20 @@ import { Account, JsonRpcProvider, KeyPairSigner } from "near-api-js";
 import fs from "node:fs";
 import path from "node:path";
 import { getNearUsd, yoctoToUsdMicro } from "./near-price.js";
+import { rpcTargets, rpcTarget, type RpcTarget } from "./rpc.js";
 
 const YOCTO = 10n ** 24n;
 const MICRO = 1_000_000n;
 const BPS = 10_000n;
 
-async function callView<T>(url: string, method: string, args: Record<string, unknown>): Promise<T> {
-  const response = await fetch(url, {
+async function callView<T>(
+  target: RpcTarget,
+  method: string,
+  args: Record<string, unknown>,
+): Promise<T> {
+  const response = await fetch(target.url, {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: { "content-type": "application/json", ...target.headers },
     body: JSON.stringify({
       jsonrpc: "2.0",
       id: 1,
@@ -39,16 +44,11 @@ async function callView<T>(url: string, method: string, args: Record<string, unk
   return JSON.parse(safe) as T;
 }
 
-const RPC_URLS = [
-  config.nearRpcUrl,
-  config.nearNetwork === "mainnet" ? "https://rpc.mainnet.near.org" : "https://rpc.testnet.near.org",
-];
-
 export async function view<T>(method: string, args: Record<string, unknown>): Promise<T> {
   let lastError: unknown = null;
-  for (const url of [...new Set(RPC_URLS.filter(Boolean))]) {
+  for (const target of rpcTargets()) {
     try {
-      return await callView<T>(url, method, args);
+      return await callView<T>(target, method, args);
     } catch (error) {
       lastError = error;
     }
@@ -357,7 +357,11 @@ export async function createOnChainMarket(input: {
       private_key: string;
     }).private_key;
   }
-  const provider = new JsonRpcProvider({ url: config.nearRpcUrl }, { retries: 3 });
+  const connection = rpcTarget();
+  const provider = new JsonRpcProvider(
+    { url: connection.url, headers: connection.headers },
+    { retries: 3 },
+  );
   const account = new Account(
     config.nearOracleAccountId,
     provider,
@@ -402,7 +406,11 @@ export async function setOnChainMarketOwner(tokenId: string, newOwner: string): 
       private_key: string;
     }).private_key;
   }
-  const provider = new JsonRpcProvider({ url: config.nearRpcUrl }, { retries: 3 });
+  const connection = rpcTarget();
+  const provider = new JsonRpcProvider(
+    { url: connection.url, headers: connection.headers },
+    { retries: 3 },
+  );
   const account = new Account(
     config.nearOracleAccountId,
     provider,
@@ -583,11 +591,11 @@ export async function getOnChainMarket(
 }
 
 export async function getAccountNearBalance(accountId: string): Promise<string> {
-  for (const url of [...new Set(RPC_URLS.filter(Boolean))]) {
+  for (const target of rpcTargets()) {
     try {
-      const response = await fetch(url, {
+      const response = await fetch(target.url, {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: { "content-type": "application/json", ...target.headers },
         body: JSON.stringify({
           jsonrpc: "2.0",
           id: 1,

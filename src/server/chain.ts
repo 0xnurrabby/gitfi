@@ -13,6 +13,7 @@ import {
 import { config, log, warn } from "./config.js";
 import { db, nowIso } from "./db.js";
 import { oracleKey } from "./ledger.js";
+import { rpcTarget } from "./rpc.js";
 
 const GAS = 100_000_000_000_000n;
 const MAX_REPO_LEN = 200;
@@ -216,8 +217,9 @@ function initChain(): { account: Account; provider: JsonRpcProvider } | null {
   }
   try {
     const privateKey = loadPrivateKey();
+    const connection = rpcTarget();
     provider = new JsonRpcProvider(
-      { url: config.nearRpcUrl },
+      { url: connection.url, headers: connection.headers },
       { retries: 4, wait: 400, backoff: 1.6 },
     );
     const signer = KeyPairSigner.fromSecretKey(privateKey as KeyPairString);
