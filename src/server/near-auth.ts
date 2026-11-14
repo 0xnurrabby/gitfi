@@ -32,10 +32,11 @@ async function hasActiveAccessKey(accountId: string, publicKey: string): Promise
       });
       if (!response.ok) continue;
       const payload = (await response.json()) as {
-        result?: { nonce?: number | string };
+        result?: { nonce?: number | string; error?: string };
         error?: { cause?: { name?: string } };
       };
-      if (payload.result) return true;
+      if (payload.result?.error) return false;
+      if (payload.result?.nonce !== undefined) return true;
       if (payload.error?.cause?.name === "UNKNOWN_ACCESS_KEY") return false;
     } catch {
       // Try the next RPC endpoint.
