@@ -524,7 +524,7 @@ export function buildNftMetadata(input: {
     description: `The unique protocol deed and license for the ${input.repoFullName} repository token ($ ${input.ticker}). Staked to the GitFi vault.`,
     media: image,
     image,
-    reference: `${base}/token/${input.tokenId}`,
+    reference: `${base}/real/${input.tokenId}`,
     copies: 1,
     repo: input.repoFullName,
     tokenId: input.tokenId,
