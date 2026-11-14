@@ -225,7 +225,7 @@ export function SiteHeader() {
   useEffect(() => {
     setMobileOpen(false);
     window.scrollTo({ top: 0, behavior: "auto" });
-    if (!location.pathname.startsWith("/token/")) {
+    if (!location.pathname.startsWith("/token/") && !location.pathname.startsWith("/real/")) {
       document.title = "GitFi.fun — Public code. Priced in public.";
     }
   }, [location.pathname]);

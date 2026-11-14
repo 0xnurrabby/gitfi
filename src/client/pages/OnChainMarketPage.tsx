@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -180,6 +180,10 @@ export function OnChainMarketPage() {
   const market = data?.market;
   const stats = data?.stats;
   const nearUsd = data?.nearUsd ?? 0;
+
+  useEffect(() => {
+    if (token) document.title = `${token.name} ($${token.ticker}) - GitFi.fun`;
+  }, [token]);
 
   const chart = useMemo(() => {
     const points = [...(data?.chart ?? [])].sort((a, b) => a.time - b.time);

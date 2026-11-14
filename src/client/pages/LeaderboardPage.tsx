@@ -128,7 +128,7 @@ export function LeaderboardPage() {
                     <span className="eyebrow"><Crown size={12} /> King of GitHub</span>
                     <span className="mono side-badge">1H</span>
                   </div>
-                  <Link to={`/token/${king.token.slug}`} className="king-side-asset">
+                  <Link to={`/real/${king.token.id}`} className="king-side-asset">
                     <AssetLogo src={king.token.logoUrl} ticker={king.token.ticker} size={42} />
                     <div><strong>${king.token.ticker}</strong><span>{king.token.repo.fullName}</span></div>
                     <ArrowUpRight size={14} />
