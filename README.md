@@ -176,7 +176,7 @@ If nobody has staked yet, the staker share remains in the contract as team/platf
 |---|---|---|
 | Real wallet login with NEAR Connect + NEP-413 | Live | Wallet picker in the app |
 | README proof and repo ownership claims | Live | `/proof` and the repo registry |
-| Repo Registry contract | Live | [`gitfi-395012.testnet`](https://explorer.testnet.near.org/accounts/gitfi-395012.testnet) |
+| Repo Registry contract | Live | [`registry.gitfi-395012.testnet`](https://explorer.testnet.near.org/accounts/registry.gitfi-395012.testnet) |
 | GitFi Market contract | Live | [`market.gitfi-395012.testnet`](https://explorer.testnet.near.org/accounts/market.gitfi-395012.testnet) |
 | Wallet-signed buy and sell | Live | Market contract |
 | On-chain balances, cost basis and PnL | Live | `/real/:tokenId` |
@@ -266,7 +266,7 @@ flowchart LR
 
 | Contract | Address | Owns |
 |---|---|---|
-| Repo Registry | [`gitfi-395012.testnet`](https://explorer.testnet.near.org/accounts/gitfi-395012.testnet) | Repo deeds, claims, freeze controls, receipt anchors |
+| Repo Registry | [`registry.gitfi-395012.testnet`](https://explorer.testnet.near.org/accounts/registry.gitfi-395012.testnet) | Repo deeds, claims, freeze controls, receipt anchors |
 | GitFi Market | [`market.gitfi-395012.testnet`](https://explorer.testnet.near.org/accounts/market.gitfi-395012.testnet) | Markets, reserves, balances, trades, staking, bounties |
 
 Selected market methods:

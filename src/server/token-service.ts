@@ -331,7 +331,7 @@ export async function launchToken(user: UserRow, input: LaunchInput): Promise<La
         repo: repo.full_name,
         tokenId,
         owner: user.address,
-        metadataUri: `${config.appUrl.replace(/\/$/, "")}${metadataUrl(tokenId)}`,
+        metadataUri: metadataUrl(tokenId),
         subjectId: tokenId,
       },
       15_000,

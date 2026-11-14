@@ -387,7 +387,7 @@ export async function verifyRepoChallenge(
       repo: freshRepo.full_name,
       tokenId: freshToken.id,
       owner: user.address,
-      metadataUri: `${config.appUrl.replace(/\/$/, "")}${metadataUrl(freshToken.id)}`,
+      metadataUri: metadataUrl(freshToken.id),
       subjectId: freshToken.id,
     };
     try {

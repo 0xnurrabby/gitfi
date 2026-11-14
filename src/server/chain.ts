@@ -763,7 +763,7 @@ export function backfillDeeds(): void {
         repo: row.repo,
         tokenId: row.token_id,
         owner: row.owner_wallet,
-        metadataUri: `${config.appUrl.replace(/\/$/, "")}/api/nft/${row.token_id}`,
+        metadataUri: `${config.appUrl.replace(/\/$/, "")}/api/nft/${row.token_id}/metadata`,
         subjectId: row.token_id,
       });
       if (tx) queued += 1;
