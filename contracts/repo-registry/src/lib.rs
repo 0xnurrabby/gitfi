@@ -87,6 +87,7 @@ pub struct NftMetadata {
 #[derive(PanicOnDefault)]
 pub struct Contract {
     pub owner_id: AccountId,
+    pub pending_owner: Option<AccountId>,
     pub oracle_public_key: Vec<u8>,
     pub paused: bool,
     pub deeds: UnorderedMap<String, RepoDeed>,
@@ -102,6 +103,7 @@ impl Contract {
         assert_eq!(oracle_public_key.len(), 32, "oracle key must be 32 bytes");
         Self {
             owner_id,
+            pending_owner: None,
             oracle_public_key,
             paused: false,
             deeds: UnorderedMap::new(b"g_deeds".to_vec()),
@@ -338,6 +340,24 @@ impl Contract {
             })
             .to_string(),
         );
+    }
+
+    /// Two-step owner rotation for a multisig or a new deployer account.
+    pub fn propose_owner(&mut self, new_owner: AccountId) {
+        self.assert_owner();
+        assert_ne!(new_owner, self.owner_id, "already owner");
+        self.pending_owner = Some(new_owner);
+    }
+
+    pub fn accept_owner(&mut self) {
+        let pending = self.pending_owner.clone().expect("no pending owner");
+        assert_eq!(env::predecessor_account_id(), pending, "pending owner only");
+        self.owner_id = pending;
+        self.pending_owner = None;
+    }
+
+    pub fn pending_owner(&self) -> Option<AccountId> {
+        self.pending_owner.clone()
     }
 
     pub fn set_oracle_public_key(&mut self, public_key: Vec<u8>) {

@@ -473,7 +473,7 @@ export function HomePage() {
           <div className="fee-equation">
             <div><strong>0.50%</strong><span>creator</span></div>
             <span className="fee-plus">+</span>
-            <div><strong>0.30%</strong><span>team</span></div>
+            <div><strong>0.30%</strong><span>platform</span></div>
             <span className="fee-plus">+</span>
             <div><strong>0.50%</strong><span>stakers</span></div>
             <span className="fee-equals">=</span>

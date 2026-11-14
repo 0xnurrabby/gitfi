@@ -189,7 +189,7 @@
             GitFi fixes that with three primitives: <strong>proof of ownership</strong>,
             <strong>a real market</strong>, and <strong>a shared fee</strong>. One repository
             becomes exactly one token. The verified owner creates it. The market discovers it.
-            Trading settles on NEAR. The creator, the team and the people who stake the token
+            Trading settles on NEAR. The creator, the platform and the people who stake the token
             all earn from the same activity.
           </p>
           <div class="callout callout-accent">
@@ -207,7 +207,7 @@
             <div><span>SETTLEMENT</span><strong>NEAR testnet</strong><em>real wallet-signed trades</em></div>
             <div><span>IDENTITY</span><strong>README proof</strong><em>no GitHub OAuth</em></div>
             <div><span>MARKET</span><strong>1 repo = 1 token</strong><em>owner-gated creation</em></div>
-            <div><span>FEES</span><strong>1.3%</strong><em>creator + team + stakers</em></div>
+            <div><span>FEES</span><strong>1.3%</strong><em>creator + platform + stakers</em></div>
           </div>
         </section>
 
@@ -331,7 +331,7 @@
             The repo and deed are joined by a single line the owner puts in their README. No
             OAuth, no GitHub app permissions, no custody of a GitHub account. The deed is
             verified against the public README and then minted on NEAR. The market is created
-            only after that proof and after the fixed 1 NEAR launch fee is paid to the team.
+            only after that proof and after the fixed 1 NEAR platform launch fee is paid.
           </p>
           <div class="callout callout-warn">
             <span class="callout-icon">!</span>
@@ -381,7 +381,7 @@
               <div>
                 <h3>The mechanism is specific</h3>
                 <p>
-                  README proof → one deed → one market → wallet-signed buy/sell → creator, team
+                  README proof → one deed → one market → wallet-signed buy/sell → creator, platform
                   and staker fees. Every number on the market page comes from the contract, not a
                   spreadsheet or a demo ledger.
                 </p>
@@ -472,15 +472,26 @@
             </div>
             <div class="step">
               <span class="step-num mono">03</span>
-              <div><h3>Pay the launch fee</h3><p>A wallet-signed transfer of 1 NEAR goes directly to the team address. The server verifies signer, receiver and amount before anything is created.</p></div>
+              <div><h3>Pay the launch fee</h3><p>A wallet-signed transfer of the 1 NEAR platform launch fee. The server verifies signer, receiver and amount before anything is created.</p></div>
             </div>
             <div class="step">
               <span class="step-num mono">04</span>
-              <div><h3>Create the market</h3><p>The market contract creates the token market and its initial reserve. The creator becomes the market owner.</p></div>
+              <div><h3>Create the market</h3><p>The market contract creates the token market and its on-chain reserve accounting. The creator becomes the market owner.</p></div>
             </div>
             <div class="step">
               <span class="step-num mono">05</span>
               <div><h3>Trade, stake, claim</h3><p>Buy or sell with NEAR. Stake tokens for fee yield. Claim creator fees. Fund bounties. Everything is signed by your wallet.</p></div>
+            </div>
+          </div>
+          <div class="callout callout-accent">
+            <span class="callout-icon">$</span>
+            <div>
+              <strong>Launch market cap</strong>
+              <p>
+                Every market starts at <strong>$10,000 + $10 per GitHub star</strong>. A repo
+                with 0 stars starts at $10,000; 250 stars at $12,500; 10,000 stars at $110,000.
+                The launch cap is converted to a real NEAR price with the live NEAR/USD quote.
+              </p>
             </div>
           </div>
         </section>
@@ -523,12 +534,12 @@
             <div class="mechanic-card">
               <span class="mono">PRICE</span>
               <h3>Step price</h3>
-              <p>Buys move the price up by one step; sells move it down. The current price is always a contract value, not an off-chain oracle.</p>
+              <p>Buys move the price up by 0.5%; sells move it down by 0.5%. The contract caps the step below the 1.3% trade fee, so a round trip cannot be arbitraged.</p>
             </div>
             <div class="mechanic-card">
               <span class="mono">RESERVE</span>
               <h3>Real NEAR liquidity</h3>
-              <p>The contract holds a reserve that pays sellers. The reserve is visible on the market page and cannot be spent by the creator.</p>
+              <p>Buying adds NEAR to a contract reserve that pays sellers. The reserve is visible on the market page and cannot be spent by the creator. A separate platform storage buffer keeps contract storage away from user reserves.</p>
             </div>
             <div class="mechanic-card">
               <span class="mono">POSITION</span>
@@ -555,11 +566,11 @@
           <h2>One market. Three participants. One point three percent.</h2>
           <div class="fee-table">
             <div class="fee-head"><span>FLOW</span><span>RECIPIENT</span><span>SHARE</span><span>HOW</span></div>
-            <div class="fee-row"><span>Token launch</span><strong>Team</strong><span class="mono">1 NEAR</span><span>Wallet transfer before creation</span></div>
+            <div class="fee-row"><span>Token launch</span><strong>Platform</strong><span class="mono">1 NEAR</span><span>Platform launch fee before creation</span></div>
             <div class="fee-row"><span>Every trade</span><strong>Creator</strong><span class="mono">0.50%</span><span>Accrues on-chain; creator claims</span></div>
-            <div class="fee-row"><span>Every trade</span><strong>Team</strong><span class="mono">0.30%</span><span>Accrues on-chain; team claims</span></div>
+            <div class="fee-row"><span>Every trade</span><strong>Platform</strong><span class="mono">0.30%</span><span>Accrues on-chain; platform claims</span></div>
             <div class="fee-row"><span>Every trade</span><strong>Stakers</strong><span class="mono">0.50%</span><span>Pro-rata fee yield, paid in NEAR</span></div>
-            <div class="fee-row fee-total"><span>Every trade</span><strong>Total</strong><span class="mono">1.30%</span><span>Creator + team + stakers</span></div>
+            <div class="fee-row fee-total"><span>Every trade</span><strong>Total</strong><span class="mono">1.30%</span><span>Creator + platform + stakers</span></div>
           </div>
           <div class="callout">
             <span class="callout-icon">i</span>
@@ -567,13 +578,13 @@
               <strong>If nobody stakes</strong>
               <p>
                 The staker share has no recipient yet. In that case it remains in the market
-                contract as team/platform revenue until staking exists. The moment users stake,
+                contract as platform revenue until staking exists. The moment users stake,
                 the 0.5% fee yield flows to them proportionally.
               </p>
             </div>
           </div>
           <p class="small">
-            Fees are testnet values in this build. The creator and team shares are claimable
+            Fees are testnet values in this build. The creator and platform shares are claimable
             from the market contract; staking rewards are claimable in NEAR. Fees never depend
             on a centralized order book or a hidden spreadsheet.
           </p>
@@ -807,7 +818,7 @@
             <div><code>create_bounty</code><span>Escrow a NEAR reward on-chain.</span></div>
             <div><code>approve_bounty / cancel_bounty</code><span>Pay the winner or refund the creator.</span></div>
             <div><code>claim_developer_fees</code><span>Creator claims 0.5% royalties.</span></div>
-            <div><code>claim_platform_fees</code><span>Team claims 0.3% share.</span></div>
+            <div><code>claim_platform_fees</code><span>Platform claims 0.3% share.</span></div>
           </div>
           <p class="small">
             The market currently uses an internal token ledger (balances inside the market
@@ -896,15 +907,15 @@
             </details>
             <details>
               <summary>How much does it cost to launch?</summary>
-              <p>1 NEAR, paid directly to the team wallet with a wallet-signed transfer. The server verifies the transaction before creating the market. The payment transaction cannot be reused.</p>
+              <p>1 NEAR platform launch fee with a wallet-signed transfer. The server verifies the transaction before creating the market. The payment transaction cannot be reused.</p>
             </details>
             <details>
               <summary>What does the 1.3% trade fee pay for?</summary>
-              <p>0.5% to the token creator, 0.3% to the team, and 0.5% to token stakers. Creator and team shares accrue on-chain; staking rewards are pro-rata and claimable in NEAR.</p>
+              <p>0.5% to the token creator, 0.3% to the platform, and 0.5% to token stakers. Creator and platform shares accrue on-chain; staking rewards are pro-rata and claimable in NEAR.</p>
             </details>
             <details>
               <summary>Do GitHub stars create tokens or yield?</summary>
-              <p>No. Stars are a discovery and credibility signal. They influence tier visibility (Seed, Rising, Viral) and help traders judge the repository, but they do not mint tokens, create yield or guarantee a price.</p>
+              <p>No. Stars set the launch market cap at $10,000 + $10 per star and influence tier visibility (Seed, Rising, Viral). They do not mint extra tokens, create yield or guarantee a price.</p>
             </details>
             <details>
               <summary>Why are prices shown in USD if trading is in NEAR?</summary>

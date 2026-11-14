@@ -38,6 +38,7 @@
     "test": "tsx --test tests/*.test.ts",
     "test:visual": "node scripts/visual-check.mjs",
     "test:smoke": "node scripts/smoke.mjs",
+    "mainnet:preflight": "node scripts/mainnet-preflight.mjs",
     "verify": "npm run typecheck && npm test && npm run build"
   },
   "dependencies": {
@@ -76,6 +77,7 @@
     "@types/react-dom": "^19.2.2",
     "@types/ws": "^8.18.1",
     "@vitejs/plugin-react": "^5.1.0",
+    "bs58": "^6.0.0",
     "concurrently": "^9.2.1",
     "playwright": "^1.65.0",
     "typescript": "^5.9.3",

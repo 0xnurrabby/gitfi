@@ -67,7 +67,7 @@ function ThemeToggle() {
 }
 
 function AccountMenu() {
-  const { user, openAuth, logout, loading } = useAuth();
+  const { user, platform, openAuth, logout, loading } = useAuth();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const location = useLocation();
@@ -160,7 +160,7 @@ function AccountMenu() {
             </button>
           </div>
           <div className="account-menu-foot mono">
-            NEAR TESTNET · ON-CHAIN MARKET
+            NEAR {(platform?.network ?? "testnet").toUpperCase()} · ON-CHAIN MARKET
           </div>
         </div>
       ) : null}
@@ -303,7 +303,7 @@ export function SiteFooter() {
         <div className="footer-col">
           <span className="footer-heading">Mechanics</span>
           <span>0.5% creator royalty</span>
-          <span>0.3% team / 0.5% stakers</span>
+          <span>0.3% platform / 0.5% stakers</span>
           <span>1.3% total trade fee</span>
           <span>1 NEAR launch fee</span>
         </div>
@@ -312,12 +312,12 @@ export function SiteFooter() {
           <a href={platform?.contractUrl ?? "https://explorer.testnet.near.org/accounts/registry.gitfi-395012.testnet"} target="_blank" rel="noreferrer">
             {platform?.contractId ?? "registry.gitfi-395012.testnet"} <ExternalLink size={11} />
           </a>
-          <span>NEAR testnet deeds</span>
+          <span>NEAR {(platform?.network ?? "testnet")} deeds</span>
           <span>On-chain NEAR market</span>
         </div>
       </div>
       <div className="footer-bottom">
-        <span>© {new Date().getFullYear()} GitFi.fun — testnet build. Trades settle on NEAR testnet.</span>
+        <span>© {new Date().getFullYear()} GitFi.fun — {(platform?.network ?? "testnet")} build. Trades settle on NEAR {(platform?.network ?? "testnet")}.</span>
         <span className="mono">NO GITHUB OAUTH · EVER</span>
       </div>
     </footer>

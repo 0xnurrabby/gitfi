@@ -14,9 +14,11 @@ use serde::{Deserialize, Serialize};
 const BPS: u128 = 10_000;
 const TRADE_FEE_BPS: u128 = 130; // 1.30%
 const CREATOR_SHARE_BPS: u128 = 50; // 0.50% of notional -> token creator
-const TEAM_SHARE_BPS: u128 = 30; // 0.30% of notional -> team
+const PLATFORM_SHARE_BPS: u128 = 30; // 0.30% of notional -> platform
 const REWARD_SCALE: u128 = 1_000_000;
 const MAX_TICKER_LEN: usize = 12;
+/// A step larger than this can be arbitraged against the trade fee.
+const MAX_STEP_BPS: u128 = 50; // 0.50%
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Serialize, Deserialize)]
 #[serde(crate = "near_sdk::serde")]
@@ -34,6 +36,7 @@ pub struct Market {
     pub sold: u128,
     pub total_supply: u128,
     pub curve_supply: u128,
+    pub max_wallet: u128,
     pub status: String,
     pub created_at: u64,
 }
@@ -69,19 +72,6 @@ pub struct Bounty {
     pub paid_at: Option<u64>,
 }
 
-/// The exact state layout of market v1. Used only for the one-time migration.
-#[derive(BorshDeserialize)]
-pub struct OldContract {
-    pub owner_id: AccountId,
-    pub markets: UnorderedMap<String, Market>,
-    pub balances: LookupMap<String, u128>,
-    pub costs: LookupMap<String, u128>,
-    pub dev_fees: LookupMap<String, u128>,
-    pub platform_fees: u128,
-    pub history: UnorderedMap<u64, TradeRecord>,
-    pub next_trade_id: u64,
-}
-
 #[near(contract_state)]
 #[derive(PanicOnDefault)]
 pub struct Contract {
@@ -102,6 +92,8 @@ pub struct Contract {
     // v2: on-chain bounty escrow
     pub bounties: UnorderedMap<u64, Bounty>,
     pub next_bounty_id: u64,
+    pub paused: bool,
+    pub pending_owner: Option<AccountId>,
 }
 
 fn balance_key(token_id: &str, account_id: &AccountId) -> String {
@@ -138,30 +130,8 @@ impl Contract {
             accrued_rewards: LookupMap::new(b"m_accrued".to_vec()),
             bounties: UnorderedMap::new(b"m_bounties".to_vec()),
             next_bounty_id: 1,
-        }
-    }
-
-    /// One-time state migration from market v1. Existing balances, cost basis,
-    /// trades and fees are preserved; new staking/bounty storage starts empty.
-    #[init(ignore_state)]
-    pub fn migrate() -> Self {
-        let old: OldContract = env::state_read().expect("old market state");
-        Self {
-            owner_id: old.owner_id,
-            markets: old.markets,
-            balances: old.balances,
-            costs: old.costs,
-            dev_fees: old.dev_fees,
-            platform_fees: old.platform_fees,
-            history: old.history,
-            next_trade_id: old.next_trade_id,
-            stakes: LookupMap::new(b"m_stakes".to_vec()),
-            total_staked: LookupMap::new(b"m_totalstaked".to_vec()),
-            reward_per_token: LookupMap::new(b"m_rpt".to_vec()),
-            paid_reward_per_token: LookupMap::new(b"m_paidrpt".to_vec()),
-            accrued_rewards: LookupMap::new(b"m_accrued".to_vec()),
-            bounties: UnorderedMap::new(b"m_bounties".to_vec()),
-            next_bounty_id: 1,
+            paused: false,
+            pending_owner: None,
         }
     }
 
@@ -176,15 +146,19 @@ impl Contract {
         curve_supply: U128,
         price: U128,
         step: U128,
+        max_wallet: U128,
     ) -> Market {
         self.assert_owner();
         assert!(self.markets.get(&token_id).is_none(), "market already exists");
         assert!(total_supply.0 > 0, "supply required");
         assert!(curve_supply.0 > 0 && curve_supply.0 <= total_supply.0, "bad curve supply");
         assert!(price.0 > 0, "price required");
+        assert!(
+            step.0 <= price.0 * MAX_STEP_BPS / BPS,
+            "step too large"
+        );
         assert!(ticker.len() <= MAX_TICKER_LEN, "ticker too long");
         let reserve = env::attached_deposit().as_yoctonear();
-        assert!(reserve > 0, "initial reserve required");
         let market = Market {
             token_id: token_id.clone(),
             repo,
@@ -196,6 +170,7 @@ impl Contract {
             sold: 0,
             total_supply: total_supply.0,
             curve_supply: curve_supply.0,
+            max_wallet: max_wallet.0,
             status: "bonding".to_string(),
             created_at: env::block_timestamp(),
         };
@@ -214,9 +189,10 @@ impl Contract {
         market
     }
 
-    /// Buy with attached NEAR. 1.3% fee: 0.5% creator, 0.3% team, 0.5% stakers.
+    /// Buy with attached NEAR. 1.3% fee: 0.5% creator, 0.3% platform, 0.5% stakers.
     #[payable]
-    pub fn buy(&mut self, token_id: String) -> U128 {
+    pub fn buy(&mut self, token_id: String, min_tokens: Option<U128>) -> U128 {
+        assert!(!self.paused, "buying is paused");
         let deposit = env::attached_deposit().as_yoctonear();
         assert!(deposit > 0, "send NEAR to buy");
         let buyer = env::predecessor_account_id();
@@ -226,10 +202,21 @@ impl Contract {
         let net = deposit - fee;
         let tokens = net / market.price;
         assert!(tokens > 0, "amount too small");
+        if let Some(minimum) = min_tokens {
+            assert!(tokens >= minimum.0, "slippage: fewer tokens than minimum");
+        }
         assert!(
             market.sold + tokens <= market.curve_supply,
             "not enough curve inventory"
         );
+        if market.max_wallet > 0 {
+            let key = balance_key(&token_id, &buyer);
+            let holding = self.balances.get(&key).unwrap_or(0) + self.stakes.get(&key).unwrap_or(0);
+            assert!(
+                holding + tokens <= market.max_wallet,
+                "wallet holding cap reached"
+            );
+        }
 
         market.sold += tokens;
         market.reserve += net;
@@ -266,12 +253,15 @@ impl Contract {
     }
 
     /// Sell tokens back into the contract reserve at the current price.
-    pub fn sell(&mut self, token_id: String, token_amount: U128) -> Promise {
+    pub fn sell(&mut self, token_id: String, token_amount: U128, min_near: Option<U128>) -> Promise {
         let seller = env::predecessor_account_id();
         let tokens = token_amount.0;
         assert!(tokens > 0, "amount required");
         let mut market = self.markets.get(&token_id).expect("market not found");
-        assert!(market.status == "bonding", "market graduated");
+        assert!(
+            market.status == "bonding" || market.status == "graduated",
+            "market closed"
+        );
         let key = balance_key(&token_id, &seller);
         let balance = self.balances.get(&key).unwrap_or(0);
         assert!(balance >= tokens, "insufficient tokens");
@@ -279,6 +269,9 @@ impl Contract {
         let gross = tokens * market.price;
         let fee = gross * TRADE_FEE_BPS / BPS;
         let net = gross - fee;
+        if let Some(minimum) = min_near {
+            assert!(net >= minimum.0, "slippage: less NEAR than minimum");
+        }
         assert!(market.reserve >= net, "market reserve too small");
 
         market.reserve -= net;
@@ -479,10 +472,27 @@ impl Contract {
         self.markets.insert(&token_id, &market);
     }
 
-    /// Rotate the protocol owner/team treasury. Used only by the current owner.
-    pub fn set_owner(&mut self, new_owner: AccountId) {
+    /// Start a two-step ownership transfer. The new owner must accept it.
+    pub fn propose_owner(&mut self, new_owner: AccountId) {
         self.assert_owner();
-        self.owner_id = new_owner;
+        assert_ne!(new_owner, self.owner_id, "already owner");
+        self.pending_owner = Some(new_owner);
+    }
+
+    pub fn accept_owner(&mut self) {
+        let pending = self.pending_owner.clone().expect("no pending owner");
+        assert_eq!(env::predecessor_account_id(), pending, "pending owner only");
+        self.owner_id = pending;
+        self.pending_owner = None;
+    }
+
+    pub fn paused(&self) -> bool {
+        self.paused
+    }
+
+    pub fn set_paused(&mut self, paused: bool) {
+        self.assert_owner();
+        self.paused = paused;
     }
 
     pub fn claim_developer_fees(&mut self, token_id: String) -> Promise {
@@ -603,15 +613,15 @@ impl Contract {
 
     /// Split the 1% trade fee: half to the developer, half to stakers. If a
     /// market has no stakers, its half remains platform revenue.
-    /// Split the 1.3% trade fee: 0.5% creator, 0.3% team, 0.5% stakers.
-    /// If a market has no stakers, its 0.5% remains team/platform revenue.
+    /// Split the 1.3% trade fee: 0.5% creator, 0.3% platform, 0.5% stakers.
+    /// If a market has no stakers, its 0.5% remains platform revenue.
     fn split_fee(&mut self, token_id: &String, fee: u128, notional: u128) {
         let creator_fee = notional * CREATOR_SHARE_BPS / BPS;
-        let team_fee = notional * TEAM_SHARE_BPS / BPS;
-        let staker_pool = fee.saturating_sub(creator_fee).saturating_sub(team_fee);
+        let platform_fee = notional * PLATFORM_SHARE_BPS / BPS;
+        let staker_pool = fee.saturating_sub(creator_fee).saturating_sub(platform_fee);
         let current_dev = self.dev_fees.get(token_id).unwrap_or(0);
         self.dev_fees.insert(token_id, &(current_dev + creator_fee));
-        self.platform_fees += team_fee;
+        self.platform_fees += platform_fee;
         let total_staked = self.total_staked.get(token_id).unwrap_or(0);
         if total_staked > 0 && staker_pool > 0 {
             let current = self.reward_per_token.get(token_id).unwrap_or(0);

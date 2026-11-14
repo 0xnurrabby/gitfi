@@ -612,8 +612,8 @@ export function PortfolioPage() {
               <em>Live USD marks.</em>
             </h3>
             <p>
-              Every position, cost basis and fill is read from the GitFi market contract on NEAR
-              testnet. Prices are shown in USD using a live NEAR/USD quote.
+              Every position, cost basis and fill is read from the GitFi market contract on NEAR{" "}
+              {data.network}. Prices are shown in USD using a live NEAR/USD quote.
             </p>
             <div className="referral-stats">
               <div>
@@ -630,7 +630,7 @@ export function PortfolioPage() {
               </div>
             </div>
             <a
-              href={`https://explorer.testnet.near.org/accounts/${data.contractId}`}
+              href={`${data.network === "mainnet" ? "https://explorer.near.org" : "https://explorer.testnet.near.org"}/accounts/${data.contractId}`}
               target="_blank"
               rel="noreferrer"
               className="text-link"

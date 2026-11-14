@@ -29,7 +29,9 @@ import {
   MILESTONE_RESERVE_MICRO,
   TIERS,
   TOTAL_SUPPLY_MICRO,
-  curveLaunchPriceMicro,
+  TOTAL_SUPPLY_TOKENS,
+  launchMarketCapUsdMicro,
+  maxWalletMicro,
   tierForStars,
 } from "../shared/economics.js";
 import { TICKER_REGEX } from "../shared/constants.js";
@@ -142,7 +144,9 @@ export async function launchToken(user: UserRow, input: LaunchInput): Promise<La
   const countdown = tierConfig.countdownSeconds;
   const launchAt = countdown > 0 ? new Date(Date.now() + countdown * 1000).toISOString() : now;
   const status = countdown > 0 ? "prelaunch" : "bonding";
-  const price = Number(curveLaunchPriceMicro(tier));
+  const launchMarketCapMicroUsd = launchMarketCapUsdMicro(repo.stars);
+  const price = Number(launchMarketCapMicroUsd / BigInt(TOTAL_SUPPLY_TOKENS));
+  const maxWallet = maxWalletMicro(tier);
   const vip = tokenConfigForTier(tier).vipThresholdMicro;
   const appBase = config.appUrl.replace(/\/$/, "");
   const logoSrc = logo.logoUrl.startsWith("data:") ? logo.logoUrl : `${appBase}${logo.logoUrl}`;
@@ -163,6 +167,8 @@ export async function launchToken(user: UserRow, input: LaunchInput): Promise<La
     tier,
     total_supply: "1000000000",
     decimals: 6,
+    launch_market_cap_usd_micro: launchMarketCapMicroUsd.toString(),
+    launch_stars: repo.stars,
     creator: user.address,
     owner: user.address,
     verified_repository: true,
@@ -215,7 +221,8 @@ export async function launchToken(user: UserRow, input: LaunchInput): Promise<La
     owner: user.address,
     totalSupplyMicro: TOTAL_SUPPLY_MICRO,
     curveSupplyMicro: CURVE_SUPPLY_MICRO,
-    priceMicro: price,
+    launchMarketCapUsdMicro: launchMarketCapMicroUsd,
+    maxWalletMicro: Number(maxWallet),
   });
 
   const result = withTransaction(() => {
@@ -224,9 +231,10 @@ export async function launchToken(user: UserRow, input: LaunchInput): Promise<La
       `INSERT INTO tokens(
         id, repo_id, slug, name, ticker, description, logo_url, logo_ipfs_url, metadata_json, website, twitter,
         owner_wallet, creator_wallet, verification, status, tier, target_market_cap_micro,
+        launch_mc_usd_micro, launch_stars,
         total_supply_micro, curve_supply_micro, milestone_reserve_micro, last_price_micro,
         vip_threshold_micro, launch_at, launched_at, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     ).run(
       tokenId,
       repo.id,
@@ -245,6 +253,8 @@ export async function launchToken(user: UserRow, input: LaunchInput): Promise<La
       status,
       tier,
       tierConfig.targetMarketCapMicro,
+      Number(launchMarketCapMicroUsd),
+      repo.stars,
       TOTAL_SUPPLY_MICRO,
       CURVE_SUPPLY_MICRO,
       MILESTONE_RESERVE_MICRO,

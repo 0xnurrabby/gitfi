@@ -189,6 +189,8 @@ CREATE TABLE IF NOT EXISTS tokens (
   status TEXT NOT NULL DEFAULT 'prelaunch',
   tier TEXT NOT NULL,
   target_market_cap_micro INTEGER NOT NULL,
+  launch_mc_usd_micro INTEGER NOT NULL DEFAULT 0,
+  launch_stars INTEGER NOT NULL DEFAULT 0,
   total_supply_micro INTEGER NOT NULL,
   curve_supply_micro INTEGER NOT NULL,
   sold_micro INTEGER NOT NULL DEFAULT 0,
@@ -464,10 +466,16 @@ INSERT OR IGNORE INTO platform_config(key, value) VALUES ('feeds_started', strft
 
 export function initDb(): void {
   db.exec(schema);
-  try {
-    db.exec("ALTER TABLE tokens ADD COLUMN logo_ipfs_url TEXT");
-  } catch {
-    // Column already exists on this database.
+  for (const statement of [
+    "ALTER TABLE tokens ADD COLUMN logo_ipfs_url TEXT",
+    "ALTER TABLE tokens ADD COLUMN launch_mc_usd_micro INTEGER NOT NULL DEFAULT 0",
+    "ALTER TABLE tokens ADD COLUMN launch_stars INTEGER NOT NULL DEFAULT 0",
+  ]) {
+    try {
+      db.exec(statement);
+    } catch {
+      // Column already exists on this database.
+    }
   }
 }
 

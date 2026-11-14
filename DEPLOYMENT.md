@@ -60,8 +60,9 @@ NEAR_CONTRACT_ID=registry.gitfi-395012.testnet
 NEAR_MARKET_CONTRACT_ID=market.gitfi-395012.testnet
 NEAR_ORACLE_ACCOUNT_ID=gitfi-395012.testnet
 NEAR_ORACLE_PRIVATE_KEY=ed25519:...
-TEAM_ADDRESS=gitfi-395012.testnet
+PLATFORM_FEE_ADDRESS=gitfi-395012.testnet
 LAUNCH_FEE_YOCTO=1000000000000000000000000
+MARKET_INITIAL_RESERVE_YOCTO=50000000000000000000000000
 NEAR_CHAIN_ENABLED=true
 NEAR_RPC_URL=https://rpc.testnet.fastnear.com
 NEAR_RPC_PROXY_URL=https://gitfi.fun/rpc
@@ -128,9 +129,51 @@ curl https://gitfi-api.onrender.com/api/home
 
 Expected: HTTP 200 and a JSON response with an empty or live market set.
 
+## Mainnet deployment
+
+Mainnet is a separate deployment with fresh contracts and a clean database.
+
+Requirements:
+
+- A funded mainnet deployer account with at least 30 NEAR for contract storage, gas and the market storage buffer.
+- A dedicated owner account, ideally a multisig or DAO. Do not keep the protocol owner key on a laptop.
+- A dedicated oracle account with a hot key. The oracle only signs repo deeds and receipt anchors.
+- A platform fee address for the 1 NEAR launch fee.
+- A fresh Turso database, or a backed-up and cleared production database.
+- A mainnet RPC relay on the Worker (`https://rpc.mainnet.fastnear.com`).
+
+Mainnet environment:
+
+```ini
+NEAR_NETWORK=mainnet
+NEAR_CONTRACT_ID=registry.<owner>.near
+NEAR_MARKET_CONTRACT_ID=market.<owner>.near
+NEAR_ORACLE_ACCOUNT_ID=oracle.<owner>.near
+NEAR_ORACLE_PRIVATE_KEY=ed25519:...
+PLATFORM_FEE_ADDRESS=<platform-fee>.near
+LAUNCH_FEE_YOCTO=1000000000000000000000000
+MARKET_INITIAL_RESERVE_YOCTO=0
+NEAR_CHAIN_ENABLED=true
+NEAR_RPC_URL=https://rpc.mainnet.fastnear.com
+NEAR_RPC_PROXY_URL=https://gitfi.fun/rpc
+NEAR_RPC_PROXY_TOKEN=...
+NEAR_EXPLORER_URL=https://explorer.near.org
+NEAR_AUTH_RECIPIENT=gitfi.fun
+```
+
+Security checklist:
+
+1. Deploy fresh `gitfi-market` and `gitfi-repo-registry` WASM builds.
+2. Fund the market contract with a storage buffer that is not counted as user reserve.
+3. Initialize the registry with the oracle public key and the multisig owner.
+4. Propose ownership from the deployer to the multisig, then accept it from the multisig.
+5. Move the launch fee address and oracle key to production secrets.
+6. Point the Worker RPC relay at mainnet and redeploy the Worker.
+7. Run a small real launch, buy, sell and stake before opening the launch page publicly.
+
 ## Security notes
 
 - Never commit `.env`, Turso tokens, Render keys or the NEAR operator private key.
 - Set `SESSION_SECRET` and `ADMIN_TOKEN` explicitly on Render. Do not rely on generated files on an ephemeral disk.
 - Render free instances have ephemeral disks. Uploaded logo files can disappear on redeploy. Tokens and market data are safe in Turso and NEAR.
-- The app is testnet-only and not audited. Complete the mainnet checklist before accepting real funds.
+- The current public build is testnet and not audited. Mainnet requires the funded deployment described above and an external audit before accepting meaningful real funds.

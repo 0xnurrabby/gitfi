@@ -344,7 +344,8 @@ export async function createOnChainMarket(input: {
   owner: string;
   totalSupplyMicro: number;
   curveSupplyMicro: number;
-  priceMicro: number;
+  launchMarketCapUsdMicro: bigint;
+  maxWalletMicro: number;
 }): Promise<void> {
   const file = path.join(
     config.nearCredentialsDir,
@@ -367,14 +368,18 @@ export async function createOnChainMarket(input: {
     provider,
     KeyPairSigner.fromSecretKey(privateKey as `ed25519:${string}`),
   );
-  // priceMicro is USD per whole token * 1e6. Convert it to yoctoNEAR per
-  // micro-token using the live NEAR/USD quote so the launch price is real.
+  // The launch market cap is exact: $10,000 + $10 per GitHub star. Convert
+  // that cap into yoctoNEAR at the live quote, then into the contract's
+  // yoctoNEAR-per-micro-token price unit.
   const { usd: nearUsd } = await getNearUsd();
   if (!(nearUsd > 0)) throw new Error("NEAR/USD price unavailable; cannot create a real market");
-  const usdPerWhole = input.priceMicro / 1_000_000;
-  const rawPrice = Math.round((usdPerWhole / nearUsd) * 1_000_000 * 1e24);
-  const price = Math.max(1_000_000, Math.min(1_000_000_000_000_000_000, rawPrice));
-  const step = Math.max(1, Math.floor(price / 10));
+  const nearUsdMicro = BigInt(Math.max(1, Math.round(nearUsd * 1_000_000)));
+  const mcNearYocto = (input.launchMarketCapUsdMicro * 10n ** 24n) / nearUsdMicro;
+  const rawPrice = mcNearYocto / BigInt(input.totalSupplyMicro);
+  const price = rawPrice > 0n ? rawPrice : 1n;
+  // 0.5% per trade. The contract enforces this cap so a round trip can never
+  // beat the 1.3% fee through the step itself.
+  const step = price / 200n > 0n ? price / 200n : 1n;
   await account.callFunction({
     contractId: config.nearMarketContractId,
     methodName: "create_market",
@@ -387,9 +392,10 @@ export async function createOnChainMarket(input: {
       curve_supply: String(input.curveSupplyMicro),
       price: String(price),
       step: String(step),
+      max_wallet: String(input.maxWalletMicro),
     },
     gas: 100_000_000_000_000n,
-    deposit: 50_000_000_000_000_000_000_000n,
+    deposit: BigInt(config.marketInitialReserveYocto),
     waitUntil: "FINAL",
   });
 }

@@ -81,6 +81,8 @@ export interface TokenRow {
   status: string;
   tier: string;
   target_market_cap_micro: number;
+  launch_mc_usd_micro: number;
+  launch_stars: number;
   total_supply_micro: number;
   curve_supply_micro: number;
   sold_micro: number;
@@ -262,6 +264,8 @@ export function tokenSummary(
     repo: repoSummary(repo),
     priceMicro: price,
     marketCapMicro: marketCapForToken(token),
+    launchMarketCapMicro: token.launch_mc_usd_micro || undefined,
+    launchStars: token.launch_stars || undefined,
     graduationTargetMicro: token.target_market_cap_micro,
     progressBps: progressForToken(token),
     volume24hMicro: token.volume_24h_micro,

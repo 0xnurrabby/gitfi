@@ -31,11 +31,11 @@ export interface PlatformInfo {
   feeBps: number;
   developerFeeBps: number;
   platformYieldShareBps: number;
-  teamAddress: string;
+  platformFeeAddress: string;
   launchFeeYocto: string;
   tradeFeeBps: number;
   creatorFeeBps: number;
-  teamFeeBps: number;
+  platformFeeBps: number;
   stakerFeeBps: number;
   demoMode: boolean;
   chainEnabled: boolean;
@@ -122,6 +122,8 @@ export interface TokenSummary {
   repo: RepoSummary;
   priceMicro: number;
   marketCapMicro: number;
+  launchMarketCapMicro?: number;
+  launchStars?: number;
   graduationTargetMicro: number;
   progressBps: number;
   volume24hMicro: number;

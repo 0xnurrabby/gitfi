@@ -75,6 +75,8 @@ function summaryFor(
     repo: repoSummary(repo),
     priceMicro: stats.priceUsdMicro,
     marketCapMicro: stats.marketCapUsdMicro,
+    launchMarketCapMicro: token.launch_mc_usd_micro || undefined,
+    launchStars: token.launch_stars || undefined,
     graduationTargetMicro: stats.marketCapUsdMicro,
     progressBps: stats.progressBps,
     volume24hMicro: stats.volume24hUsdMicro,

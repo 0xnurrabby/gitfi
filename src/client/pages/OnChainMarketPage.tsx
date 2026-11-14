@@ -180,6 +180,8 @@ export function OnChainMarketPage() {
   const market = data?.market;
   const stats = data?.stats;
   const nearUsd = data?.nearUsd ?? 0;
+  const isMainnet = data?.network === "mainnet";
+  const explorerOrigin = isMainnet ? "https://explorer.near.org" : "https://explorer.testnet.near.org";
 
   useEffect(() => {
     if (token) document.title = `${token.name} ($${token.ticker}) - GitFi.fun`;
@@ -275,11 +277,19 @@ export function OnChainMarketPage() {
     mutationFn: async () => {
       if (!market) throw new Error("Market is not live.");
       if (side === "buy") {
-        return signAndSend("buy", { token_id: market.tokenId }, buyAmount);
+        return signAndSend(
+          "buy",
+          {
+            token_id: market.tokenId,
+            min_tokens: ((buyQuote * 995n) / 1000n).toString(),
+          },
+          buyAmount,
+        );
       }
       return signAndSend("sell", {
         token_id: market.tokenId,
         token_amount: sellAmount.toString(),
+        min_near: ((sellQuote * 995n) / 1000n).toString(),
       });
     },
     onSuccess: () => {
@@ -289,7 +299,7 @@ export function OnChainMarketPage() {
         side === "buy"
           ? "On-chain buy confirmed by the market contract."
           : "On-chain sell confirmed by the market contract.",
-        { kind: "success", title: "Testnet transaction" },
+        { kind: "success", title: isMainnet ? "Mainnet transaction" : "Testnet transaction" },
       );
     },
     onError: (error) =>
@@ -435,14 +445,19 @@ export function OnChainMarketPage() {
               </Badge>
             </div>
             <span className="mono muted">{market.repo}</span>
+            {token.launchMarketCapMicro ? (
+              <span className="mono muted" style={{ display: "block", marginTop: 4 }}>
+                Launch {formatUsd(token.launchMarketCapMicro)} · {token.launchStars ?? 0} stars
+              </span>
+            ) : null}
           </div>
         </div>
         <div className="onchain-contract">
           <span className="mono">
-            NEAR TESTNET · LIVE NEAR ${nearUsd ? nearUsd.toFixed(3) : "—"}
+            NEAR {isMainnet ? "MAINNET" : "TESTNET"} · LIVE NEAR ${nearUsd ? nearUsd.toFixed(3) : "—"}
           </span>
           <a
-            href={`https://explorer.testnet.near.org/accounts/${data.contractId}`}
+            href={`${explorerOrigin}/accounts/${data.contractId}`}
             target="_blank"
             rel="noreferrer"
             className="text-link mono"
@@ -471,7 +486,7 @@ export function OnChainMarketPage() {
                 </span>
               </div>
               <a
-                href={`https://explorer.testnet.near.org/accounts/${data.contractId}`}
+                href={`${explorerOrigin}/accounts/${data.contractId}`}
                 target="_blank"
                 rel="noreferrer"
                 className="text-link mono"
@@ -701,7 +716,7 @@ export function OnChainMarketPage() {
         <Card className="onchain-trade">
           <div className="side-card-head">
             <span className="eyebrow">Execute on NEAR</span>
-            <span className="mono">LIVE TESTNET</span>
+            <span className="mono">{isMainnet ? "LIVE MAINNET" : "LIVE TESTNET"}</span>
           </div>
           <div className="onchain-toggle">
             <button

@@ -39,8 +39,8 @@ export function recordLaunchPayment(payment: VerifiedLaunchPayment, wallet: stri
 }
 
 /**
- * Verifies that the launcher paid the fixed launch fee directly to the team
- * address before a token/market can be created. The transaction must be final,
+ * Verifies that the launcher paid the fixed platform launch fee to the
+ * configured platform fee address before a token/market can be created. The transaction must be final,
  * signed by the launching wallet, and addressed to the configured team account.
  */
 export async function verifyLaunchPayment(
@@ -84,9 +84,9 @@ export async function verifyLaunchPayment(
           "PAYMENT_WRONG_SIGNER",
         );
       }
-      if (tx.receiver_id !== config.teamAddress) {
+      if (tx.receiver_id !== config.platformFeeAddress) {
         throw new GithubError(
-          `The launch payment must go directly to ${config.teamAddress}.`,
+          "The launch payment was sent to the wrong address.",
           422,
           "PAYMENT_WRONG_RECEIVER",
         );

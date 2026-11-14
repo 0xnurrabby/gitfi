@@ -232,9 +232,9 @@ export function LaunchPage() {
       if (!user || !nearWallet) {
         throw new ApiRequestError("Connect your NEAR wallet to pay the launch fee.", 401, "AUTH_REQUIRED");
       }
-      const teamAddress = platform?.teamAddress;
-      if (!teamAddress) {
-        throw new ApiRequestError("Team wallet is not configured.", 500, "TEAM_ADDRESS_MISSING");
+      const platformFeeAddress = platform?.platformFeeAddress;
+      if (!platformFeeAddress) {
+        throw new ApiRequestError("Platform fee address is not configured.", 500, "PLATFORM_FEE_ADDRESS_MISSING");
       }
       const fee = BigInt(platform?.launchFeeYocto ?? "1000000000000000000000000");
       const accounts = await nearWallet.getAccounts({
@@ -242,7 +242,7 @@ export function LaunchPage() {
       });
       const signerId = accounts[0]?.accountId ?? user.address;
       const outcome = await nearWallet.signAndSendTransaction({
-        receiverId: teamAddress,
+        receiverId: platformFeeAddress,
         signerId,
         actions: [{ type: "Transfer", params: { deposit: fee.toString() } }],
       });
@@ -331,8 +331,8 @@ export function LaunchPage() {
           <strong>Only the verified repository owner can create this token.</strong>
           <span>
             One repo → one token. Another wallet cannot launch a market from your repo;
-            ownership is proven with the README sync line first. The 1 NEAR launch fee
-            goes directly to the team wallet.
+            ownership is proven with the README sync line first. The 1 NEAR platform
+            launch fee activates the market.
           </span>
         </div>
       </div>
@@ -620,10 +620,10 @@ export function LaunchPage() {
               <div className="launch-owner-only" style={{ marginTop: 12, marginBottom: 12 }}>
                 <Wallet size={16} />
                 <div>
-                  <strong>Launch fee: 1 NEAR</strong>
+                  <strong>Platform launch fee: 1 NEAR</strong>
                   <span>
-                    Paid directly to the team wallet{" "}
-                    <span className="mono">{platform?.teamAddress ?? "gitfi-395012.testnet"}</span>{" "}
+                    Paid as a platform fee{" "}
+                    <span className="mono">{platform?.platformFeeAddress ?? "configured by the platform"}</span>{" "}
                     before the market is created.
                   </span>
                 </div>

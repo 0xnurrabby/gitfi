@@ -35,6 +35,23 @@ export const PLATFORM_FEE_BPS = 50;
 export const PLATFORM_YIELD_SHARE_BPS = 4_000;
 export const REFERRAL_SHARE_BPS = 1_000; // of net platform fee
 
+/** Every launch starts at $10,000 plus $10 for every GitHub star. */
+export const LAUNCH_MC_BASE_USD = 10_000;
+export const LAUNCH_MC_PER_STAR_USD = 10;
+/** Guardrail for pathological star counts; keeps on-chain math bounded. */
+export const MAX_LAUNCH_STARS = 10_000_000;
+
+export function effectiveLaunchStars(stars: number): number {
+  if (!Number.isFinite(stars)) return 0;
+  return Math.max(0, Math.min(MAX_LAUNCH_STARS, Math.floor(stars)));
+}
+
+/** Exact launch market cap in micro-USD. */
+export function launchMarketCapUsdMicro(stars: number): bigint {
+  const count = effectiveLaunchStars(stars);
+  return BigInt(LAUNCH_MC_BASE_USD + count * LAUNCH_MC_PER_STAR_USD) * BigInt(ONE_USD);
+}
+
 export type Tier = "seed" | "rising" | "viral";
 
 export interface TierConfig {

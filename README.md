@@ -102,11 +102,15 @@ GitFi is not a generic token factory. The repository is the product. The market 
 |---:|---|---|
 | **01** | Connect a NEAR wallet with NEAR Connect and NEP-413 | Wallet |
 | **02** | Add one sync line to the public README and prove repo control | GitHub + API |
-| **03** | Pay the **1 NEAR** launch fee directly to the team wallet | NEAR transfer |
+| **03** | Pay the **1 NEAR** platform launch fee | NEAR transfer |
 | **04** | The market contract creates the token market and reserve | NEAR contract |
 | **05** | Buy, sell, stake, claim and fund bounties with wallet-signed transactions | NEAR contract |
 
-The server verifies the 1 NEAR payment before the market is created. The transaction must be final, signed by the launcher, addressed to the team wallet and never reused.
+The server verifies the 1 NEAR platform fee before the market is created. The transaction must be final, signed by the launcher, sent to the configured platform fee address, and never reused.
+
+### Launch market cap
+
+Every market starts at **$10,000 + $10 per GitHub star**. A repository with 0 stars launches at a $10,000 market cap; 250 stars launches at $12,500; 10,000 stars launches at $110,000. The cap is converted to a real NEAR launch price with the live NEAR/USD quote when the market is created.
 
 ---
 
@@ -144,7 +148,7 @@ These rules are enforced by the API and the database, not just by the interface.
 
 **1 NEAR**
 
-Paid directly to the team wallet before launch. Wallet-signed and verified on-chain. One repository, one token, one market.
+Platform launch fee before the market is created. Wallet-signed and verified on-chain. One repository, one token, one market.
 
 </td>
 <td width="50%" valign="top">
@@ -153,7 +157,7 @@ Paid directly to the team wallet before launch. Wallet-signed and verified on-ch
 
 **1.3%**
 
-The creator, the team and the people staking the token all earn from the same activity.
+The creator, the platform and the people staking the token all earn from the same activity.
 
 </td>
 </tr>
@@ -162,11 +166,11 @@ The creator, the team and the people staking the token all earn from the same ac
 | Recipient | Share | How it is paid |
 |---|---:|---|
 | Token creator | **0.50%** | Accrues on-chain, claimed from the market contract |
-| Team | **0.30%** | Accrues on-chain, claimed from the market contract |
+| Platform | **0.30%** | Accrues on-chain, claimed from the market contract |
 | Token stakers | **0.50%** | Pro-rata fee yield, claimed in NEAR |
-| **Total** | **1.30%** | Creator + team + stakers |
+| **Total** | **1.30%** | Creator + platform + stakers |
 
-If nobody has staked yet, the staker share remains in the contract as team/platform revenue until staking exists. Once users stake, the 0.5% fee yield flows to them proportionally.
+If nobody has staked yet, the staker share remains in the contract as platform revenue until staking exists. Once users stake, the 0.5% fee yield flows to them proportionally.
 
 ---
 
@@ -214,7 +218,7 @@ If you are evaluating this project, start here:
 | Question | GitFi answer |
 |---|---|
 | What is the real problem? | Open-source builders create enormous value without a market layer for recognition or upside. |
-| What is the new mechanism? | README ownership proof -> one deed -> one market -> wallet-signed trading with creator, team and staker fees. |
+| What is the new mechanism? | README ownership proof -> one deed -> one market -> wallet-signed trading with creator, platform and staker fees. |
 | Why NEAR? | Fast finality, low-fee trading, NEP-413 login and a clean wallet-signed transaction model. Remove NEAR and the product does not work. |
 | What is honest about the build? | Testnet, step-price market, internal token ledger, no audit yet. The docs call out every boundary. |
 | What is the long-term vision? | A discovery and ownership layer for open source, where the best work can be recognised early and the people maintaining it can keep building. |
@@ -242,7 +246,7 @@ flowchart LR
   subgraph NEAR["NEAR testnet"]
     Registry["Repo Registry + deeds"]
     Market["GitFi Market + reserve"]
-    Fees["Creator + team + staker fees"]
+    Fees["Creator + platform + staker fees"]
   end
 
   UI --> Express
@@ -273,9 +277,9 @@ flowchart LR
 Selected market methods:
 
 ```text
-create_market(token_id, repo, ticker, owner, supply, curve_supply, price, step)
-buy(token_id)                         payable in NEAR
-sell(token_id, token_amount)          pays NEAR from reserve
+create_market(token_id, repo, ticker, owner, supply, curve_supply, price, step, max_wallet)
+buy(token_id, min_tokens)              payable in NEAR
+sell(token_id, token_amount, min_near) pays NEAR from reserve
 stake(token_id, token_amount)         token fee yield
 unstake(token_id, token_amount)
 claim_staking_rewards(token_id)
@@ -283,7 +287,7 @@ create_bounty(token_id, title, description)
 approve_bounty(bounty_id, winner)
 cancel_bounty(bounty_id)
 claim_developer_fees(token_id)        creator share
-claim_platform_fees()                 team share
+claim_platform_fees()                 platform share
 get_market / get_balance / get_cost / get_trades / get_bounties
 ```
 
@@ -383,9 +387,11 @@ scripts/             seed reset, smoke and visual checks
 - README proof is wallet-bound, one-time and nonce-based.
 - Only a verified owner can create the repository token and market.
 - Buy, sell, stake, claim and bounty actions are wallet-signed contract calls.
-- The sell reserve, creator fees, team fees, staking pool and bounty escrow are tracked separately on-chain.
+- The sell reserve, creator fees, platform fees, staking pool and bounty escrow are tracked separately on-chain.
 - The server cannot move user funds.
 - The market uses checked integer math and explicit bounds.
+- The step price is capped at 0.5% per trade, below the 1.3% fee, so a buy and immediate sell cannot extract a risk-free profit.
+- The reserve is funded by buys; the platform keeps a separate storage buffer so user reserves are not spent on contract storage.
 - The current build is **testnet** and **not audited**.
 - Tokens currently use an internal ledger inside the market contract, not a standalone NEP-141 contract per repository.
 - The market is a step-price market, not a full constant-product DEX. Mainnet needs a clear decision on graduation and liquidity.
@@ -411,13 +417,13 @@ No. GitFi only reads the public README. Ownership is proven by adding one tempor
 <details>
 <summary><strong>How much does it cost to launch?</strong></summary>
 <br />
-1 NEAR, paid directly to the team wallet with a wallet-signed transfer. The server verifies the final transaction before creating the market. The payment cannot be reused.
+1 NEAR platform launch fee with a wallet-signed transfer. The server verifies the final transaction before creating the market. The payment cannot be reused.
 </details>
 
 <details>
 <summary><strong>What does the 1.3% trade fee pay for?</strong></summary>
 <br />
-0.5% to the token creator, 0.3% to the team and 0.5% to token stakers. Creator and team shares accrue on-chain. Staking rewards are pro-rata and claimable in NEAR.
+0.5% to the token creator, 0.3% to the platform and 0.5% to token stakers. Creator and platform shares accrue on-chain. Staking rewards are pro-rata and claimable in NEAR.
 </details>
 
 <details>

@@ -60,14 +60,20 @@ export const config = {
       ? "https://explorer.near.org"
       : "https://explorer.testnet.near.org"),
   nearOracleAccountId: process.env.NEAR_ORACLE_ACCOUNT_ID ?? "gitfi-395012.testnet",
-  teamAddress:
+  platformFeeAddress:
+    process.env.PLATFORM_FEE_ADDRESS ??
     process.env.TEAM_ADDRESS ??
     process.env.NEAR_ORACLE_ACCOUNT_ID ??
     "gitfi-395012.testnet",
   launchFeeYocto: process.env.LAUNCH_FEE_YOCTO ?? "1000000000000000000000000",
+  marketInitialReserveYocto:
+    process.env.MARKET_INITIAL_RESERVE_YOCTO ??
+    ((process.env.NEAR_NETWORK ?? "testnet") === "mainnet"
+      ? "0"
+      : "50000000000000000000000000"),
   tradeFeeBps: 130,
   creatorFeeBps: 50,
-  teamFeeBps: 30,
+  platformFeeBps: 30,
   stakerFeeBps: 50,
   nearChainEnabled: process.env.NEAR_CHAIN_ENABLED !== "false",
   nearCredentialsDir:
