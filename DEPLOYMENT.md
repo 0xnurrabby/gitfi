@@ -2,11 +2,13 @@
 
 GitFi is deployed as three pieces:
 
-| Piece | Host | What it does |
+| Piece | Host | Live URL |
 |---|---|---|
-| Frontend + API proxy | Cloudflare Worker with static assets | Serves the React app and `/docs`, proxies `/api`, `/ws`, `/cdn` to Render |
-| Backend API | Render web service | Express API, README proof, NEAR chain bridge, indexing |
-| Database | Turso | Remote libSQL database used by the API |
+| Frontend + API proxy | Cloudflare Worker with static assets | `https://gitfi-fun.nurrabby01-bd.workers.dev` |
+| Backend API | Render web service | `https://gitfi-api.onrender.com` |
+| Database | Turso | `libsql://gitfi-gitfi.aws-ap-south-1.turso.io` |
+
+The intended public domain is `gitfi.fun`. The domain currently uses Spaceship nameservers, so attaching it to Cloudflare requires a DNS change at the registrar or a CNAME at the current DNS provider. The Worker and API are live on their provider URLs until that DNS step is completed.
 
 ## 1. Turso
 
@@ -93,16 +95,17 @@ The intended domains are:
 
 - `gitfi.fun` - frontend
 - `docs.gitfi.fun` - documentation (also available at `/docs/` and GitHub Pages)
-- `api.gitfi.fun` - optional direct API hostname for Render
 
-To put the Worker on `gitfi.fun`, the domain's nameservers must be managed by Cloudflare (or a DNS CNAME must target the Worker). Then add a Worker custom domain/route:
+`gitfi.fun` currently uses Spaceship nameservers (`launch1.spaceship.net`, `launch2.spaceship.net`), not Cloudflare. A Cloudflare Worker custom domain requires the domain to be an active zone in the Cloudflare account. The Worker and API are therefore live on their provider URLs until the nameservers are moved to Cloudflare or the domain is otherwise delegated.
+
+Once `gitfi.fun` is an active Cloudflare zone, add a Worker custom domain:
 
 ```bash
-npx wrangler deployments list
-# Add gitfi.fun in Cloudflare Dashboard -> Workers -> gitfi-fun -> Settings -> Domains
+# Cloudflare Dashboard -> Workers -> gitfi-fun -> Settings -> Domains
+# Add gitfi.fun
 ```
 
-If the domain remains on another DNS provider, create the required CNAME/route there. DNS ownership is the only step that cannot be completed from this repository.
+Then add a `docs` DNS record or a second Worker route for `docs.gitfi.fun`. The static docs also work immediately on GitHub Pages and at `/docs/`.
 
 ## 4. Docs
 

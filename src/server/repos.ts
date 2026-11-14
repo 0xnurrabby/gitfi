@@ -516,11 +516,14 @@ export function buildNftMetadata(input: {
   tier: string;
 }): Record<string, unknown> {
   const base = config.appUrl.replace(/\/$/, "");
+  const image = input.logoUrl.startsWith("data:")
+    ? input.logoUrl
+    : `${base}${input.logoUrl}`;
   return {
     title: `GitFi Repo Deed · ${input.repoFullName}`,
     description: `The unique protocol deed and license for the ${input.repoFullName} repository token ($ ${input.ticker}). Staked to the GitFi vault.`,
-    media: `${base}${input.logoUrl}`,
-    image: `${base}${input.logoUrl}`,
+    media: image,
+    image,
     reference: `${base}/token/${input.tokenId}`,
     copies: 1,
     repo: input.repoFullName,

@@ -144,6 +144,8 @@ export async function launchToken(user: UserRow, input: LaunchInput): Promise<La
   const status = countdown > 0 ? "prelaunch" : "bonding";
   const price = Number(curveLaunchPriceMicro(tier));
   const vip = tokenConfigForTier(tier).vipThresholdMicro;
+  const appBase = config.appUrl.replace(/\/$/, "");
+  const logoSrc = logo.logoUrl.startsWith("data:") ? logo.logoUrl : `${appBase}${logo.logoUrl}`;
   const metadata = {
     spec: "ft-1.0.0",
     schema: "gitfi-token/1.0",
@@ -151,9 +153,9 @@ export async function launchToken(user: UserRow, input: LaunchInput): Promise<La
     symbol: input.ticker,
     ticker: input.ticker,
     description: input.description.trim(),
-    icon: `${config.appUrl.replace(/\/$/, "")}${logo.logoUrl}`,
-    image: `${config.appUrl.replace(/\/$/, "")}${logo.logoUrl}`,
-    reference: `${config.appUrl.replace(/\/$/, "")}/token/${slug}`,
+    icon: logoSrc,
+    image: logoSrc,
+    reference: `${appBase}/token/${slug}`,
     repo: repo.full_name,
     website,
     twitter,
@@ -369,8 +371,10 @@ export async function updateTokenLogo(
         return {};
       }
     })();
-    meta.image = `${config.appUrl.replace(/\/$/, "")}${logo.logoUrl}`;
-    meta.icon = `${config.appUrl.replace(/\/$/, "")}${logo.logoUrl}`;
+    const appBase = config.appUrl.replace(/\/$/, "");
+    const logoSrc = logo.logoUrl.startsWith("data:") ? logo.logoUrl : `${appBase}${logo.logoUrl}`;
+    meta.image = logoSrc;
+    meta.icon = logoSrc;
     db.prepare(
       "UPDATE tokens SET logo_url = ?, metadata_json = ?, updated_at = ? WHERE id = ?",
     ).run(logo.logoUrl, JSON.stringify(meta), now, token.id);
@@ -380,8 +384,8 @@ export async function updateTokenLogo(
     if (nft) {
       try {
         const nftMeta = JSON.parse(nft.metadata_json) as Record<string, unknown>;
-        nftMeta.image = `${config.appUrl.replace(/\/$/, "")}${logo.logoUrl}`;
-        nftMeta.media = `${config.appUrl.replace(/\/$/, "")}${logo.logoUrl}`;
+        nftMeta.image = logoSrc;
+        nftMeta.media = logoSrc;
         db.prepare("UPDATE repo_nfts SET metadata_json = ?, updated_at = ? WHERE repo_id = ?").run(
           JSON.stringify(nftMeta),
           now,

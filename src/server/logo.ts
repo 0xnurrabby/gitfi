@@ -41,9 +41,10 @@ export async function saveLogoDataUrl(dataUrl: string): Promise<SavedLogo> {
     .webp({ quality: 80 })
     .toBuffer();
   fs.writeFileSync(path.join(uploadDir, `${hash}-128.webp`), thumb);
+  const logoUrl = `data:image/webp;base64,${buffer.toString("base64")}`;
   return {
-    logoUrl: `/cdn/logo/${filename}`,
-    metadataImage: `/cdn/logo/${filename}`,
+    logoUrl,
+    metadataImage: logoUrl,
     hash,
   };
 }
@@ -96,9 +97,10 @@ export async function generateLogo(
   fs.writeFileSync(path.join(uploadDir, filename), buffer);
   const thumb = await sharp(buffer).resize(128, 128).webp({ quality: 80 }).toBuffer();
   fs.writeFileSync(path.join(uploadDir, `${hash}-128.webp`), thumb);
+  const logoUrl = `data:image/webp;base64,${buffer.toString("base64")}`;
   return {
-    logoUrl: `/cdn/logo/${filename}`,
-    metadataImage: `/cdn/logo/${filename}`,
+    logoUrl,
+    metadataImage: logoUrl,
     hash,
   };
 }
