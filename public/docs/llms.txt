@@ -8,7 +8,7 @@
 - Docs: https://docs.gitfi.fun
 - Docs mirror: https://gitfi.fun/docs/
 - Market contract: https://explorer.testnet.near.org/accounts/market.gitfi-395012.testnet
-- Repo registry: https://explorer.testnet.near.org/accounts/gitfi-395012.testnet
+- Repo registry: https://explorer.testnet.near.org/accounts/registry.gitfi-395012.testnet
 
 ## What GitFi does
 
