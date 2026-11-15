@@ -5,10 +5,6 @@ import type { TokenDetail } from "../../shared/types.js";
 import { api } from "../lib/api.js";
 import { buttonClass, EmptyState, Skeleton } from "../components/ui.js";
 
-/**
- * Legacy /token/:slug links now land on the real NEAR market page. Trading
- * moved on-chain; the old oracle-ledger page is no longer a trading surface.
- */
 export function TokenPage() {
   const { slug } = useParams();
   const { data, isLoading, isError } = useQuery({

@@ -348,7 +348,6 @@ communityRouter.post(
       db.prepare(
         "UPDATE bounties SET status = 'paid', claimant_wallet = ?, paid_at = ?, updated_at = ? WHERE id = ?",
       ).run(submission.wallet, now, now, bounty.id);
-      // Move escrowed tokens into the contributor's holding.
       const existing = db
         .prepare("SELECT * FROM holdings WHERE user_id = ? AND token_id = ?")
         .get(submission.user_id, token.id) as

@@ -9,7 +9,6 @@ const root = path.resolve(__dirname, "../..");
 try {
   process.loadEnvFile(path.join(root, ".env"));
 } catch {
-  // .env is optional.
 }
 
 const isProduction = process.env.NODE_ENV === "production";
@@ -24,7 +23,6 @@ function persistentSecret(name: string, envName: string): string {
     const existing = fs.readFileSync(file, "utf8").trim();
     if (existing.length >= 24) return existing;
   } catch {
-    // generate below
   }
   const generated = crypto.randomBytes(48).toString("base64url");
   fs.writeFileSync(file, generated, { mode: 0o600 });

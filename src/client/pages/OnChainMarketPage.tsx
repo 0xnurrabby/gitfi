@@ -138,7 +138,6 @@ function usdMicroFromYocto(yocto: bigint, nearUsd: number): number {
 }
 
 function usdPriceFromMarketPrice(priceYoctoPerMicro: bigint, nearUsd: number): number {
-  // price is yoctoNEAR per micro-token; convert to USD per whole token, in micro-USD.
   return Math.round((Number(priceYoctoPerMicro) * nearUsd * 1_000_000) / 1e18);
 }
 

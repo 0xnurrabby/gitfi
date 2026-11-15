@@ -5,12 +5,6 @@ export interface RpcTarget {
   headers: Record<string, string>;
 }
 
-/**
- * NEAR RPC targets in priority order. When the Cloudflare Worker proxy is
- * configured, backend reads and oracle transactions go through it so they do
- * not share Render's rate-limited egress IP. Direct endpoints remain as a
- * fallback.
- */
 export function rpcTargets(): RpcTarget[] {
   const targets: RpcTarget[] = [];
   if (config.nearRpcProxyUrl) {

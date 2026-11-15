@@ -107,7 +107,6 @@ export function ReadmeView({ token }: { token: TokenDetail }) {
                 },
                 img({ src, alt, ...props }) {
                   return (
-                    // eslint-disable-next-line jsx-a11y/alt-text
                     <img
                       src={resolveImage(typeof src === "string" ? src : undefined, token.repo.fullName)}
                       alt={alt ?? ""}

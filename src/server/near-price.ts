@@ -1,10 +1,3 @@
-/**
- * Live NEAR/USD reference price.
- *
- * Trading settles in NEAR. The UI prices the market in USD using this feed.
- * Several independent public sources are tried in order; the last good quote
- * is kept if every source is temporarily unavailable.
- */
 
 interface Quote {
   usd: number;
@@ -46,7 +39,6 @@ async function fetchQuote(): Promise<Quote> {
         return { usd, source: source.name, updatedAt: Date.now() };
       }
     } catch {
-      // Try the next independent source.
     }
   }
   if (cached) return cached;

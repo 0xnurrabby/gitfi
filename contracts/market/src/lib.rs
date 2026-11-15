@@ -1,9 +1,3 @@
-//! GitFi Market v2
-//!
-//! Real NEAR-quoted markets for GitFi repo tokens. The contract holds the
-//! sell-side reserve, tracks each account's token balance and cost basis,
-//! distributes half of every trade fee to token stakers, and escrows
-//! on-chain bounties. The Repo Registry still owns the deed.
 
 use borsh::{BorshDeserialize, BorshSerialize};
 use near_sdk::collections::{LookupMap, UnorderedMap};
@@ -12,13 +6,12 @@ use near_sdk::{env, near, AccountId, NearToken, PanicOnDefault, Promise};
 use serde::{Deserialize, Serialize};
 
 const BPS: u128 = 10_000;
-const TRADE_FEE_BPS: u128 = 130; // 1.30%
-const CREATOR_SHARE_BPS: u128 = 50; // 0.50% of notional -> token creator
-const PLATFORM_SHARE_BPS: u128 = 30; // 0.30% of notional -> platform
+const TRADE_FEE_BPS: u128 = 130;
+const CREATOR_SHARE_BPS: u128 = 50;
+const PLATFORM_SHARE_BPS: u128 = 30;
 const REWARD_SCALE: u128 = 1_000_000;
 const MAX_TICKER_LEN: usize = 12;
-/// A step larger than this can be arbitraged against the trade fee.
-const MAX_STEP_BPS: u128 = 50; // 0.50%
+const MAX_STEP_BPS: u128 = 50;
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Serialize, Deserialize)]
 #[serde(crate = "near_sdk::serde")]
@@ -27,11 +20,8 @@ pub struct Market {
     pub repo: String,
     pub ticker: String,
     pub owner: Option<AccountId>,
-    /// yoctoNEAR per micro-token
     pub price: u128,
-    /// price increment after each trade, in yoctoNEAR
     pub step: u128,
-    /// NEAR held by the contract to pay sellers
     pub reserve: u128,
     pub sold: u128,
     pub total_supply: u128,
@@ -48,9 +38,7 @@ pub struct TradeRecord {
     pub token_id: String,
     pub account_id: AccountId,
     pub side: String,
-    /// yoctoNEAR paid or received
     pub near_amount: u128,
-    /// micro-tokens
     pub token_amount: u128,
     pub price: u128,
     pub timestamp: u64,
@@ -64,7 +52,6 @@ pub struct Bounty {
     pub creator: AccountId,
     pub title: String,
     pub description: String,
-    /// yoctoNEAR held in escrow
     pub reward: u128,
     pub status: String,
     pub winner: Option<AccountId>,
@@ -83,13 +70,11 @@ pub struct Contract {
     pub platform_fees: u128,
     pub history: UnorderedMap<u64, TradeRecord>,
     pub next_trade_id: u64,
-    // v2: on-chain staking reward accounting
     pub stakes: LookupMap<String, u128>,
     pub total_staked: LookupMap<String, u128>,
     pub reward_per_token: LookupMap<String, u128>,
     pub paid_reward_per_token: LookupMap<String, u128>,
     pub accrued_rewards: LookupMap<String, u128>,
-    // v2: on-chain bounty escrow
     pub bounties: UnorderedMap<u64, Bounty>,
     pub next_bounty_id: u64,
     pub paused: bool,
@@ -189,7 +174,6 @@ impl Contract {
         market
     }
 
-    /// Buy with attached NEAR. 1.3% fee: 0.5% creator, 0.3% platform, 0.5% stakers.
     #[payable]
     pub fn buy(&mut self, token_id: String, min_tokens: Option<U128>) -> U128 {
         assert!(!self.paused, "buying is paused");
@@ -252,7 +236,6 @@ impl Contract {
         U128(tokens)
     }
 
-    /// Sell tokens back into the contract reserve at the current price.
     pub fn sell(&mut self, token_id: String, token_amount: U128, min_near: Option<U128>) -> Promise {
         let seller = env::predecessor_account_id();
         let tokens = token_amount.0;
@@ -304,9 +287,7 @@ impl Contract {
         Promise::new(seller).transfer(NearToken::from_yoctonear(net))
     }
 
-    // ------------------------------ staking ------------------------------
 
-    /// Lock tokens and earn a pro-rata share of every trade fee.
     pub fn stake(&mut self, token_id: String, token_amount: U128) {
         let caller = env::predecessor_account_id();
         let tokens = token_amount.0;
@@ -377,10 +358,7 @@ impl Contract {
         Promise::new(caller).transfer(NearToken::from_yoctonear(amount))
     }
 
-    // ------------------------------ bounties ------------------------------
 
-    /// Anyone can fund a real on-chain bounty for a repo. The NEAR stays in
-    /// escrow until the market owner approves a winner or the creator cancels.
     #[payable]
     pub fn create_bounty(
         &mut self,
@@ -424,8 +402,6 @@ impl Contract {
         bounty
     }
 
-    /// Only the repo's market owner can approve a winner. The escrow pays out
-    /// in the same transaction and the bounty is closed forever.
     pub fn approve_bounty(&mut self, bounty_id: u64, winner: AccountId) -> Promise {
         let caller = env::predecessor_account_id();
         let mut bounty = self.bounties.get(&bounty_id).expect("bounty not found");
@@ -463,7 +439,6 @@ impl Contract {
         Promise::new(caller).transfer(NearToken::from_yoctonear(bounty.reward))
     }
 
-    // ------------------------------ owner ------------------------------
 
     pub fn set_market_owner(&mut self, token_id: String, new_owner: AccountId) {
         self.assert_owner();
@@ -472,7 +447,6 @@ impl Contract {
         self.markets.insert(&token_id, &market);
     }
 
-    /// Start a two-step ownership transfer. The new owner must accept it.
     pub fn propose_owner(&mut self, new_owner: AccountId) {
         self.assert_owner();
         assert_ne!(new_owner, self.owner_id, "already owner");
@@ -513,7 +487,6 @@ impl Contract {
         Promise::new(env::predecessor_account_id()).transfer(NearToken::from_yoctonear(amount))
     }
 
-    /// Owner can top up the reserve of a market so sells keep working.
     #[payable]
     pub fn add_reserve(&mut self, token_id: String) {
         self.assert_owner();
@@ -524,7 +497,6 @@ impl Contract {
         self.markets.insert(&token_id, &market);
     }
 
-    // ------------------------------- views -------------------------------
 
     pub fn get_market(&self, token_id: String) -> Option<Market> {
         self.markets.get(&token_id)
@@ -575,7 +547,6 @@ impl Contract {
         rows
     }
 
-    /// Newest trades across every market, for the on-chain indexer.
     pub fn get_all_trades(&self, from_index: Option<u64>, limit: Option<u64>) -> Vec<TradeRecord> {
         let start = from_index.unwrap_or(0);
         let max = limit.unwrap_or(200).min(500);
@@ -611,10 +582,6 @@ impl Contract {
         assert_eq!(env::predecessor_account_id(), self.owner_id, "owner only");
     }
 
-    /// Split the 1% trade fee: half to the developer, half to stakers. If a
-    /// market has no stakers, its half remains platform revenue.
-    /// Split the 1.3% trade fee: 0.5% creator, 0.3% platform, 0.5% stakers.
-    /// If a market has no stakers, its 0.5% remains platform revenue.
     fn split_fee(&mut self, token_id: &String, fee: u128, notional: u128) {
         let creator_fee = notional * CREATOR_SHARE_BPS / BPS;
         let platform_fee = notional * PLATFORM_SHARE_BPS / BPS;

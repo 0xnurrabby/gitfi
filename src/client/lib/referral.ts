@@ -6,7 +6,6 @@ try {
     localStorage.setItem(REFERRAL_KEY, ref.toUpperCase());
   }
 } catch {
-  // Referral capture must never break the app.
 }
 
 export function getStoredReferral(): string | null {
@@ -22,6 +21,5 @@ export function clearStoredReferral(): void {
   try {
     localStorage.removeItem(REFERRAL_KEY);
   } catch {
-    // Ignore storage failures.
   }
 }

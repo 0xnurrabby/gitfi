@@ -115,7 +115,6 @@ export async function getAllOnChainTokens(): Promise<TokenSummary[]> {
       }),
     );
   }
-  // Attach USD value to unclaimed dev fees with the live NEAR quote.
   for (const token of result) {
     const market = snapshot.markets.find((item) => item.tokenId === token.id);
     if (!market) continue;

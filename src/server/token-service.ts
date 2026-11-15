@@ -212,8 +212,6 @@ export async function launchToken(user: UserRow, input: LaunchInput): Promise<La
     tier,
   });
 
-  // The market is the real token ledger. Create it on-chain first so a launch
-  // can never succeed with a fake/local-only asset.
   await createOnChainMarket({
     tokenId,
     repo: repo.full_name,
@@ -405,7 +403,6 @@ export async function updateTokenLogo(
           token.repo_id,
         );
       } catch {
-        // Leave old metadata if corrupt.
       }
     }
     appendReceipt("token.logo.update", token.id, {

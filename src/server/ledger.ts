@@ -34,7 +34,6 @@ export function oracleKey(): OracleKey {
       return parsed;
     }
   } catch {
-    // Generate a deterministic-per-install oracle key.
   }
   const seed = crypto.randomBytes(32);
   const pair = nacl.sign.keyPair.fromSeed(seed);

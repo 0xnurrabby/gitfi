@@ -1,18 +1,3 @@
-/**
- * GitFi.fun economic core.
- *
- * Money is integer micro-USD. Tokens are integer micro-tokens (6 decimals).
- *
- * The bonding curve is a closed-form rational curve:
- *   price(s) = K / (S - s)^2
- * where s is curve-tokens sold, S is curve supply and K is derived from
- * the tier's graduation market cap. It is calibrated so that at 80% of S:
- *   - the token reaches its graduation FDV
- *   - the raise exactly seeds a CPMM pool at the same marginal price
- *   - the remaining curve inventory splits into DEX liquidity and burn
- *
- * No platform or developer capital is required at any point.
- */
 
 export const BPS = 10_000;
 export const USD_DECIMALS = 6;
@@ -33,12 +18,10 @@ export const FEE_BPS = 100;
 export const DEVELOPER_FEE_BPS = 50;
 export const PLATFORM_FEE_BPS = 50;
 export const PLATFORM_YIELD_SHARE_BPS = 4_000;
-export const REFERRAL_SHARE_BPS = 1_000; // of net platform fee
+export const REFERRAL_SHARE_BPS = 1_000;
 
-/** Every launch starts at $10,000 plus $10 for every GitHub star. */
 export const LAUNCH_MC_BASE_USD = 10_000;
 export const LAUNCH_MC_PER_STAR_USD = 10;
-/** Guardrail for pathological star counts; keeps on-chain math bounded. */
 export const MAX_LAUNCH_STARS = 10_000_000;
 
 export function effectiveLaunchStars(stars: number): number {
@@ -46,7 +29,6 @@ export function effectiveLaunchStars(stars: number): number {
   return Math.max(0, Math.min(MAX_LAUNCH_STARS, Math.floor(stars)));
 }
 
-/** Exact launch market cap in micro-USD. */
 export function launchMarketCapUsdMicro(stars: number): bigint {
   const count = effectiveLaunchStars(stars);
   return BigInt(LAUNCH_MC_BASE_USD + count * LAUNCH_MC_PER_STAR_USD) * BigInt(ONE_USD);
@@ -120,7 +102,6 @@ export function targetPriceMicro(tier: Tier): bigint {
   return BigInt(TIERS[tier].targetMarketCapMicro) / BigInt(TOTAL_SUPPLY_TOKENS);
 }
 
-/** K = P_grad * L_grad^2, expressed with micro-units. */
 export function curveK(tier: Tier): bigint {
   const remainingAtGrad =
     (BigInt(CURVE_SUPPLY_MICRO) * BigInt(BPS - GRADUATION_SOLD_BPS)) / BigInt(BPS);
@@ -131,7 +112,6 @@ export function curveLaunchPriceMicro(tier: Tier): bigint {
   return targetPriceMicro(tier) * BigInt(BPS - GRADUATION_SOLD_BPS) ** 2n / BigInt(BPS) ** 2n;
 }
 
-/** Price in micro-USD per whole token at a given amount sold. */
 export function curvePriceMicro(tier: Tier, soldMicro: bigint): bigint {
   const remaining = BigInt(CURVE_SUPPLY_MICRO) - soldMicro;
   if (remaining <= 0n) return 0n;
@@ -139,10 +119,6 @@ export function curvePriceMicro(tier: Tier, soldMicro: bigint): bigint {
   return k / (remaining * remaining);
 }
 
-/**
- * Base (fee-exclusive) cost in micro-USD, rounded up.
- * C = K * q / ((S - s) * (S - s - q) * 1e6)
- */
 export function curveCostBetween(
   tier: Tier,
   soldMicro: bigint,
@@ -161,7 +137,6 @@ export function curveCostBetween(
   return (numerator + denominator - 1n) / denominator;
 }
 
-/** Base cost from zero to current sold amount, rounded up. */
 export function curveCostFromZero(tier: Tier, soldMicro: bigint): bigint {
   return curveCostBetween(tier, 0n, soldMicro);
 }
@@ -182,7 +157,6 @@ export function maxWalletMicro(tier: Tier): bigint {
   return (BigInt(TOTAL_SUPPLY_MICRO) * BigInt(TIERS[tier].perWalletCapBps)) / BigInt(BPS);
 }
 
-/** Find the largest token quantity whose base cost fits a budget. */
 export function tokensForBudget(
   tier: Tier,
   soldMicro: bigint,
@@ -194,7 +168,6 @@ export function tokensForBudget(
   let high = supply - soldMicro;
   if (maxOutMicro < high) high = maxOutMicro;
   if (high < 0n) high = 0n;
-  // A finite budget can never purchase the asymptotically infinite last unit.
   const finiteMax = supply - soldMicro - 1n;
   if (finiteMax <= 0n) return 0n;
   if (high > finiteMax) high = finiteMax;
@@ -232,10 +205,6 @@ export function floorBps(amount: bigint, bps: number): bigint {
   return (amount * BigInt(bps)) / BigInt(BPS);
 }
 
-/**
- * Simulate a fee-inclusive curve buy from a total spend.
- * Returns base cost, fee, tokens and next state.
- */
 export function quoteCurveBuyFromUsd(
   tier: Tier,
   soldMicro: bigint,
@@ -253,11 +222,7 @@ export function quoteCurveBuyFromUsd(
   const untilGrad = BigInt(GRADUATION_SOLD_MICRO) - soldMicro;
   const maxOut = minBig(maxWallet, untilGrad);
   let tokens = tokensForBudget(tier, soldMicro, net, maxOut);
-  // Use every last micro-dollar where possible, keeping the fee ledger exact.
   let baseCost = curveCostBetween(tier, soldMicro, tokens);
-  if (tokens > 0n && nextTokenCost(tier, soldMicro, tokens) <= net) {
-    // no-op; retained for clarity
-  }
   while (tokens > 0n && baseCost > net) {
     tokens -= 1n;
     baseCost = curveCostBetween(tier, soldMicro, tokens);
@@ -276,10 +241,6 @@ export function quoteCurveBuyFromUsd(
     feeMicro: fee,
     nextSoldMicro: soldMicro + tokens,
   };
-}
-
-function nextTokenCost(tier: Tier, soldMicro: bigint, tokens: bigint): bigint {
-  return curveCostBetween(tier, soldMicro, tokens + 1n);
 }
 
 export function quoteCurveSell(
@@ -327,7 +288,6 @@ export function progressBps(state: CurveState): number {
   return Number((state.soldMicro * BigInt(BPS)) / BigInt(GRADUATION_SOLD_MICRO));
 }
 
-/** CPMM buy where fee is taken from the user's total spend. */
 export function quoteDexBuy(
   poolQuoteMicro: bigint,
   poolTokenMicro: bigint,
@@ -339,7 +299,6 @@ export function quoteDexBuy(
   return { tokensMicro: tokens, feeMicro: fee, netMicro: net };
 }
 
-/** CPMM sell where the fee is deducted from the quote proceeds. */
 export function quoteDexSell(
   poolQuoteMicro: bigint,
   poolTokenMicro: bigint,

@@ -55,8 +55,6 @@ export function createApp() {
     next();
   });
 
-  // Same-site enforcement for browser mutations. API clients without an Origin
-  // (CLI, webhooks) are still subject to signed wallet auth and rate limits.
   app.use((req, res, next) => {
     if (["GET", "HEAD", "OPTIONS"].includes(req.method)) {
       next();
@@ -103,15 +101,12 @@ export function createApp() {
   app.use("/api", apiLimiter);
   let lastLaunchSweep = 0;
   app.use("/api", (req, res, next) => {
-    // Prelaunch markets become tradeable the instant their anti-snipe countdown
-    // ends, without waiting for the background metric worker.
     try {
       if (Date.now() - lastLaunchSweep > 2_000) {
         activateDueLaunches();
         lastLaunchSweep = Date.now();
       }
     } catch {
-      // A metric write must never break an API request.
     }
     next();
   });
@@ -145,8 +140,6 @@ export function createApp() {
   const indexHtml = path.join(clientDir, "index.html");
   const docsDir = path.join(clientDir, "docs");
   if (fs.existsSync(docsDir)) {
-    // Future docs.gitfi.fun: when the app is reached through the docs host,
-    // serve the docs bundle at the root of that hostname.
     app.use((req, res, next) => {
       if (!req.hostname.toLowerCase().startsWith("docs.")) {
         next();

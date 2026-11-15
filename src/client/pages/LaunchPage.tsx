@@ -127,9 +127,6 @@ export function LaunchPage() {
           : `${base} Verified public code, priced and funded by its community on GitFi.`).slice(0, 600),
       );
     }
-    if (preview?.repo.topics?.length) {
-      // set socials only if empty
-    }
   }, [repoSummary, preview, name, ticker, description]);
 
   const reset = () => {
@@ -190,7 +187,6 @@ export function LaunchPage() {
         return;
       }
     } catch {
-      // Fall through to a fresh README challenge.
     } finally {
       setResuming(false);
     }

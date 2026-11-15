@@ -804,7 +804,6 @@ async function seedToken(
     user.xp += Math.max(1, Math.floor(Number(base + fee) / 100_000));
   };
 
-  // Expand holder allocations into a sequence of purchases.
   const buyPlans: Array<{ user: SeedUser; amount: bigint }> = [];
   for (const [userId, amount] of plans) {
     const user = userById.get(userId)!;
@@ -820,7 +819,6 @@ async function seedToken(
     }
     if (left > 0n) buyPlans.push({ user, amount: left });
   }
-  // Chronological timestamps, weighted toward recent activity.
   buyPlans.sort(() => rng() - 0.5);
   const curveStart = launchTime + 15 * 60_000;
   const curveEndForBuys = curveEnd - 15 * 60_000;
@@ -845,7 +843,6 @@ async function seedToken(
     simulation.holdings.set(plan.user.id, holding);
     addTrade(plan.user, "buy", "curve", q, base, fee, Math.min(time, now - 5 * 60_000));
   }
-  // Add sell/rebuy volatility so the chart contains both directions.
   const holderIds = [...simulation.holdings.keys()].filter((id) => id !== owner?.id);
   const dipCount = def.status === "graduated" ? 7 : 9;
   for (let d = 0; d < dipCount; d += 1) {
@@ -878,7 +875,6 @@ async function seedToken(
     holding.cost += bounceBase + bounceFee;
     addTrade(userById.get(userId)!, "buy", "curve", q, bounceBase, bounceFee, baseTime + 120_000);
   }
-  // Ensure final state is exactly at target.
   const finalPrice = curvePriceMicro(tier, simulation.sold);
   simulation.price = finalPrice;
   if (simulation.sold !== finalSold) {
@@ -917,7 +913,6 @@ async function seedToken(
       simulation.holdings.set(buyer.id, holding);
       addTrade(buyer, "buy", "dex", tokensOut, base, fee, Math.min(time, now - 5 * 60_000));
     }
-    // Recent micro-flow for a rich 24-hour candle series.
     const flowCount = 14;
     for (let i = 0; i < flowCount; i += 1) {
       const time = now - (flowCount - i) * 95 * 60_000 + Math.floor(rng() * 300_000);
@@ -957,8 +952,6 @@ async function seedToken(
     }
   }
 
-  // Recent microstructure: paired sell/re-buy flow gives the 24h candle series
-  // realistic body density without changing the inventory held by users.
   const noiseHolder = [...simulation.holdings.entries()]
     .filter(([userId, h]) => h.amount > 10_000_000n && userId !== owner?.id)
     .sort((a, b) => Number(b[1].amount - a[1].amount))[0];
@@ -1268,7 +1261,6 @@ async function seedToken(
         iso(now),
       );
     }
-    // Stakes and dividend accrual.
     const stakers = [...simulation.holdings.entries()]
       .filter(([userId, h]) => h.amount > 0n && userId !== owner?.id)
       .sort((a, b) => Number(b[1].amount - a[1].amount))
@@ -1390,7 +1382,6 @@ async function seedToken(
       JSON.stringify({ tier, mode: owner ? "owner" : "community" }),
       iso(launchTime),
     );
-    // A few recent trade activities make the live feed legible.
     const recentTrades = simulation.trades
       .filter((t) => !t.noise && t.time > now - 18 * 3_600_000)
       .slice(-3);
@@ -1497,7 +1488,6 @@ export async function seedDemoData(force = false): Promise<void> {
     await seedToken(def, index, users, owners, rng, now);
   }
 
-  // Seed social surface: proposals, bounties and gated chat.
   const byTicker = new Map<string, { tokenId: string; repoId: string; owner?: SeedUser }>();
   for (const def of TOKEN_SEEDS) {
     byTicker.set(def.ticker, {
@@ -1524,7 +1514,6 @@ export async function seedDemoData(force = false): Promise<void> {
     return row;
   };
 
-  // Bounties: escrowed from the verified developer's purchased inventory.
   const bounties: Array<{ ticker: string; title: string; description: string; reward: number; status: "open" | "review" | "paid" }> = [
     {
       ticker: "BUN",
@@ -1595,7 +1584,6 @@ export async function seedDemoData(force = false): Promise<void> {
     }
   }
 
-  // Proposals and votes.
   const proposalSeeds: Array<{ ticker: string; title: string; kind: "pr" | "issue" | "feature"; url: string }> = [
     {
       ticker: "CODE",
@@ -1655,7 +1643,6 @@ export async function seedDemoData(force = false): Promise<void> {
     }
   }
 
-  // Chat messages.
   const chatSeeds: Array<{ ticker: string; house: string; text: string }> = [
     {
       ticker: "BUN",
@@ -1711,7 +1698,6 @@ export async function seedDemoData(force = false): Promise<void> {
     );
   }
 
-  // Additional recent protocol activity.
   const extraActivity = [
     {
       type: "claim",

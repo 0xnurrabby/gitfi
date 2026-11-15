@@ -32,7 +32,6 @@ export function processStarMilestones(
     .prepare("SELECT milestone FROM star_events WHERE token_id = ? ORDER BY milestone DESC LIMIT 1")
     .get(tokenId) as { milestone: number } | undefined;
   if (!last) {
-    // Establish a baseline without burning historical supply.
     db.prepare(
       "INSERT INTO star_events(id, token_id, repo_id, stars, milestone, burn_micro, created_at) VALUES (?, ?, ?, ?, ?, 0, ?)",
     ).run(randomId("str_"), tokenId, repoId, stars, milestone, nowIso());
@@ -47,7 +46,6 @@ export function processStarMilestones(
   const previousStars = last.milestone;
   const jump = Math.max(0, stars - previousStars);
   if (jump > Math.max(500, previousStars * 0.05)) {
-    // Calibrate a stale baseline without emitting an implausible burn event.
     db.prepare(
       "INSERT INTO star_events(id, token_id, repo_id, stars, milestone, burn_micro, created_at) VALUES (?, ?, ?, ?, ?, 0, ?)",
     ).run(randomId("str_"), tokenId, repoId, stars, milestone, nowIso());

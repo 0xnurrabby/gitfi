@@ -82,7 +82,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (alive) setNearWallet(wallet);
       })
       .catch(() => {
-        // No persisted wallet; the user will connect explicitly.
       });
     return () => {
       alive = false;
@@ -196,7 +195,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session.user);
       if (session.platform) setPlatform(session.platform);
     } catch {
-      // Keep the last known profile rather than flicker.
     }
   }, []);
 

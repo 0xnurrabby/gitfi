@@ -272,13 +272,11 @@ async function readmeAtCommit(fullName: string, sha: string): Promise<{
       README_CACHE.set(cacheKey, { markdown, sha: digest, url, at: Date.now() });
       return { markdown, sha: digest, url };
     } catch {
-      // Try another README casing.
     }
   }
   return null;
 }
 
-/** A no-API-quota metadata fallback using GitHub's public HTML and commit Atom feed. */
 async function loadGithubRepoFromHtml(
   input: string,
   opts: { requireReadme?: boolean; skipReadme?: boolean } = {},
@@ -495,7 +493,6 @@ async function fetchReadme(
         README_CACHE.set(cacheKey, { ...result, at: Date.now() });
         return result;
       } catch {
-        // Try the next likely README path.
       }
     }
   }
@@ -554,7 +551,6 @@ export async function fetchReadmeFromApi(
         return { markdown, sha, url };
       } catch (error) {
         if (error instanceof GithubError) throw error;
-        // Try the next path.
       }
     }
   }
@@ -751,7 +747,6 @@ export function upsertRepo(data: GithubRepoData, opts: { forceReadme?: boolean }
     now,
     now,
   );
-  // Snapshot is used for true star velocity, not synthetic activity.
   const lastSnapshot = db
     .prepare(
       "SELECT stars, taken_at FROM star_snapshots WHERE repo_id = ? ORDER BY taken_at DESC LIMIT 1",
@@ -767,8 +762,6 @@ export function upsertRepo(data: GithubRepoData, opts: { forceReadme?: boolean }
         0.1,
         (Date.now() - new Date(lastSnapshot.taken_at).getTime()) / 3_600_000,
       );
-      // A huge jump relative to the last snapshot usually means the baseline was
-      // stale (or the repo went viral off-platform). Never show impossible velocity.
       const plausible = delta <= Math.max(400, lastSnapshot.stars * 0.04);
       if (hours <= 2.5) {
         db.prepare("UPDATE repos SET star_velocity_1h = ? WHERE id = ?").run(

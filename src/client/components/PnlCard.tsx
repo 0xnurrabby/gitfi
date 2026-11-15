@@ -57,7 +57,6 @@ async function makePnlCard(
 
   ctx.fillStyle = dark;
   ctx.fillRect(0, 0, 1200, 630);
-  // faint architectural grid
   ctx.strokeStyle = "rgba(238,244,231,0.055)";
   ctx.lineWidth = 1;
   for (let x = 0; x <= 1200; x += 60) {
@@ -72,7 +71,6 @@ async function makePnlCard(
     ctx.lineTo(1200, y);
     ctx.stroke();
   }
-  // accent architecture
   ctx.strokeStyle = "rgba(201,244,93,0.22)";
   ctx.lineWidth = 1.5;
   ctx.strokeRect(34.5, 34.5, 1131, 561);
@@ -87,7 +85,6 @@ async function makePnlCard(
   ctx.arc(1078, 80, 64, 0, Math.PI * 2);
   ctx.stroke();
 
-  // brand
   ctx.fillStyle = brandAccent;
   ctx.font = '800 26px "Geist Variable", Arial, sans-serif';
   ctx.fillText("GitFi", 64, 86);
@@ -145,7 +142,6 @@ async function makePnlCard(
   ctx.fillStyle = muted;
   ctx.fillText(`TIER / ${token.tier.toUpperCase()}`, 330, 258);
 
-  // hero PnL
   ctx.fillStyle = muted;
   ctx.font = '600 12px "Geist Mono Variable", monospace';
   ctx.fillText("UNREALIZED P&L", 64, 338);
@@ -156,7 +152,6 @@ async function makePnlCard(
   ctx.font = '600 27px "Geist Mono Variable", monospace';
   ctx.fillText(`${positive ? "+" : ""}${formatPercent(roi, { decimals: 1 })}`, 66, 480);
 
-  // right side metrics grid
   const metrics: Array<[string, string]> = [
     ["POSITION", `${formatTokens(amountMicro, { compact: true })} ${token.ticker}`],
     ["ENTRY", formatPrice(costMicro > 0 ? (costMicro * 1_000_000) / amountMicro : 0)],
@@ -182,7 +177,6 @@ async function makePnlCard(
     ctx.fillText(val, x, y + 54);
   });
 
-  // bottom identity
   ctx.strokeStyle = line;
   ctx.beginPath();
   ctx.moveTo(64, 522);
@@ -204,7 +198,6 @@ async function makePnlCard(
   ctx.fillStyle = muted;
   ctx.fillText("NOT FINANCIAL ADVICE", 1135, 578);
   ctx.textAlign = "left";
-  // corner stamp
   ctx.save();
   ctx.translate(1052, 138);
   ctx.rotate(-0.08);

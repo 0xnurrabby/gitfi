@@ -8,7 +8,6 @@ export function getNearConnector(network: string): NearConnector {
   if (!connector) {
     connector = new NearConnector({
       network: resolved,
-      // Login requires a wallet that can sign a NEP-413 message.
       features: { signMessage: true },
       autoConnect: false,
     });

@@ -562,7 +562,6 @@ function settleTradeInTransaction(
     if (vestingLocked > newAmount) vestingLocked = newAmount;
   }
 
-  // Developer purchases during the bonding phase are vested automatically.
   if (
     input.side === "buy" &&
     phaseBefore === "bonding" &&
@@ -608,7 +607,6 @@ function settleTradeInTransaction(
     user.id,
   );
 
-  // Fee allocation.
   const devFee = quote.feeParts.developer;
   let platformNet = quote.feeParts.platformNet;
   let referral = 0n;
@@ -1065,7 +1063,6 @@ export function stakeTokens(
       user.id,
     );
 
-    // Yield accumulated while nobody was staked is distributed to the first stakers.
     if (previousTotal === 0 && token.pending_yield_micro > 0 && totalStaked > 0) {
       const pendingYield = toBigInt(token.pending_yield_micro);
       const increment = (pendingYield * 1_000_000_000_000_000_000n) / toBigInt(totalStaked);
@@ -1075,7 +1072,6 @@ export function stakeTokens(
       db.prepare(
         "INSERT INTO dividend_events(id, token_id, trade_id, amount_micro, created_at) VALUES (?, ?, NULL, ?, ?)",
       ).run(randomId("dvd_"), tokenId, Number(pendingYield), now);
-      // Existing/new stake must earn this new increment, so reset its debt to the pre-distribution acc.
       db.prepare(
         "UPDATE stakes SET reward_debt_scaled = ? WHERE user_id = ? AND token_id = ?",
       ).run(String(acc), user.id, tokenId);
@@ -1210,7 +1206,6 @@ export interface ClaimResult {
 export function claimEarnings(user: UserRow): ClaimResult {
   return withTransaction(() => {
     const now = nowIso();
-    // Materialize pending staking dividends first.
     const stakes = db
       .prepare(
         `SELECT s.*, t.dividend_acc_scaled FROM stakes s JOIN tokens t ON t.id = s.token_id WHERE s.user_id = ?`,

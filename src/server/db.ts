@@ -24,7 +24,6 @@ export const db = usingTurso
   : new Database(path.join(dataDir, "gitfi.db"));
 
 if (usingTurso) {
-  // Remote libSQL only supports a subset of SQLite pragmas.
   db.exec("PRAGMA foreign_keys = ON;");
 } else {
   db.exec(`
@@ -476,7 +475,6 @@ export function initDb(): void {
     try {
       db.exec(statement);
     } catch {
-      // Column already exists on this database.
     }
   }
 }
@@ -491,7 +489,6 @@ export function withTransaction<T>(fn: () => T): T {
     try {
       db.exec("ROLLBACK");
     } catch {
-      // ignore rollback errors
     }
     throw error;
   }

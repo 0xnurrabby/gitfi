@@ -19,8 +19,6 @@ import type { UserRow } from "../auth.js";
 
 export const marketRouter = Router();
 
-// Legacy oracle-ledger market endpoints are retired. All trading, charts,
-// holders, activity and staking now live in the on-chain market contract.
 for (const retired of [
   "/tokens/:id/chart",
   "/tokens/:id/tabs",

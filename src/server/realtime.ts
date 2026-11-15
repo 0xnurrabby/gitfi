@@ -57,7 +57,6 @@ export function publish(event: RealtimeEvent): void {
       try {
         socket.send(payload);
       } catch {
-        // socket will be cleaned by close handler
       }
     }
   }
@@ -162,7 +161,6 @@ export function attachRealtime(server: Server): void {
           ws.send(JSON.stringify({ type: "pong", data: Date.now() }));
         }
       } catch {
-        // Ignore malformed messages.
       }
     });
 

@@ -39,7 +39,6 @@ async function hasActiveAccessKey(accountId: string, publicKey: string): Promise
       if (payload.result?.nonce !== undefined) return true;
       if (payload.error?.cause?.name === "UNKNOWN_ACCESS_KEY") return false;
     } catch {
-      // Try the next RPC endpoint.
     }
   }
   return false;
@@ -58,7 +57,6 @@ function borshString(value: string): Buffer {
   return Buffer.concat([length, bytes]);
 }
 
-/** NEP-413: sha256(u32(2147484061) | message | nonce[32] | recipient | None) */
 function nep413Hash(message: string, nonce: Buffer, recipient: string): Buffer {
   const payload = Buffer.concat([
     u32le(NEP413_TAG),

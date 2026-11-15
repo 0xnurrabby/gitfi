@@ -39,7 +39,6 @@ async function callView<T>(
   const bytes = payload.result?.result ?? [];
   const text = Buffer.from(bytes).toString("utf8");
   if (!text) return null as T;
-  // Keep integer literals above Number.MAX_SAFE_INTEGER exact.
   const safe = text.replace(/:(\s*)(-?\d{16,})(?=\s*[,}])/g, ':"$2"');
   return JSON.parse(safe) as T;
 }
@@ -368,17 +367,12 @@ export async function createOnChainMarket(input: {
     provider,
     KeyPairSigner.fromSecretKey(privateKey as `ed25519:${string}`),
   );
-  // The launch market cap is exact: $10,000 + $10 per GitHub star. Convert
-  // that cap into yoctoNEAR at the live quote, then into the contract's
-  // yoctoNEAR-per-micro-token price unit.
   const { usd: nearUsd } = await getNearUsd();
   if (!(nearUsd > 0)) throw new Error("NEAR/USD price unavailable; cannot create a real market");
   const nearUsdMicro = BigInt(Math.max(1, Math.round(nearUsd * 1_000_000)));
   const mcNearYocto = (input.launchMarketCapUsdMicro * 10n ** 24n) / nearUsdMicro;
   const rawPrice = mcNearYocto / BigInt(input.totalSupplyMicro);
   const price = rawPrice > 0n ? rawPrice : 1n;
-  // 0.5% per trade. The contract enforces this cap so a round trip can never
-  // beat the 1.3% fee through the step itself.
   const step = price / 200n > 0n ? price / 200n : 1n;
   await account.callFunction({
     contractId: config.nearMarketContractId,
@@ -505,7 +499,6 @@ export async function getChainSnapshot(force = false): Promise<ChainSnapshot> {
   return snapshotInflight;
 }
 
-/** Dev fees and staked totals change slowly; keep them off the hot path. */
 export async function getFeeSnapshot(force = false): Promise<FeeSnapshot> {
   if (!force && feeSnapshot && Date.now() - feeSnapshot.fetchedAt < 60_000) return feeSnapshot;
   if (!feeInflight) {
@@ -613,7 +606,6 @@ export async function getAccountNearBalance(accountId: string): Promise<string> 
       const payload = (await response.json()) as { result?: { amount?: string } };
       if (payload.result?.amount) return payload.result.amount;
     } catch {
-      // Try the next RPC endpoint.
     }
   }
   return "0";

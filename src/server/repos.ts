@@ -62,11 +62,6 @@ function verificationResultForRepo(user: UserRow, repo: RepoRow): VerifyResult {
   };
 }
 
-/**
- * A previously used challenge is not a failure: if this wallet already proved
- * this exact repository, return the resumable result. This makes retries after
- * a slow GitHub raw propagation safe and idempotent.
- */
 function usedChallengeResult(user: UserRow, repoFullName: string): VerifyResult | null {
   const repo = db
     .prepare("SELECT * FROM repos WHERE full_name_lc = ?")
@@ -114,7 +109,6 @@ export function createRepoChallenge(user: UserRow, repoInput: string): {
   const id = randomId("vch_");
   const expiresAt = addSecondsIso(VERIFICATION_TTL_SECONDS);
   const now = nowIso();
-  // Invalidate older open challenges from this wallet for the same repo.
   db.prepare(
     `UPDATE verification_challenges SET used_at = ? WHERE user_id = ? AND repo_lc = ? AND used_at IS NULL`,
   ).run(now, user.id, repo.toLowerCase());
@@ -159,8 +153,6 @@ export async function verifyRepoChallenge(
   if (challenge.wallet !== user.address) {
     throw new GithubError("This verification code belongs to another wallet.", 403, "WALLET_MISMATCH");
   }
-  // Already proven by this wallet? Resume without touching GitHub. This makes
-  // Retry/Regenerate/Refresh completely free after a successful verification.
   const alreadyVerified = usedChallengeResult(user, challenge.repo_full_name);
   if (alreadyVerified) {
     if (!challenge.used_at) {
@@ -187,9 +179,6 @@ export async function verifyRepoChallenge(
     Boolean(data.readme && (readmeContainsCode(data.readme, challenge.code) || data.readme.includes(shortCode)));
 
   if (!proofFound) {
-    // raw.githubusercontent.com is the fastest path but can lag a few seconds
-    // behind a fresh commit. Fall back to the GitHub contents API so the
-    // verification does not fail just because a CDN edge is stale.
     const apiReadme = await fetchReadmeFromApi(data.fullName, data.defaultBranch);
     if (apiReadme) {
       data.readme = apiReadme.markdown;
@@ -200,9 +189,6 @@ export async function verifyRepoChallenge(
     }
   }
   if (!proofFound) {
-    // Final quota-free fallback: read the README at the latest commit SHA from
-    // the public Atom feed. This is cache-busted per commit and does not consume
-    // GitHub's REST quota.
     const latestReadme = await fetchReadmeAtLatestCommit(data.fullName, data.defaultBranch);
     if (latestReadme) {
       data.readme = latestReadme.markdown;
@@ -226,7 +212,6 @@ export async function verifyRepoChallenge(
   const repo = getRepo(repoId);
   if (!repo) throw new GithubError("Repository could not be indexed.", 500, "REPO_INDEX_FAILED");
 
-  // Refresh the AI read so the token page is useful immediately.
   const summary = await generateSummary(repo.full_name, repo.description, data.readme, safeTopics(repo));
   db.prepare("UPDATE repos SET summary_json = ?, summary_at = ?, readme_md = ?, readme_sha = ?, readme_fetched_at = ? WHERE id = ?").run(
     JSON.stringify(summary),
@@ -323,7 +308,6 @@ export async function verifyRepoChallenge(
             repo.id,
           );
         } catch {
-          // Preserve metadata if it cannot be parsed.
         }
       }
       nft = (nftRow as unknown as Record<string, unknown>) ?? null;

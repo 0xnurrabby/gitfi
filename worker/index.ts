@@ -85,7 +85,6 @@ async function handleRpc(request: Request, env: Env): Promise<Response> {
       }
       last = response;
     } catch {
-      // Try the next RPC endpoint.
     }
   }
 
@@ -132,8 +131,6 @@ export default {
     headers.set("host", target.host);
     headers.set("x-forwarded-host", url.host);
     headers.set("x-forwarded-proto", "https");
-    // The API checks Origin for browser mutations. The public app origin is
-    // the trusted frontend; the worker is the only route to the API.
     headers.set("origin", env.APP_ORIGIN || "https://gitfi.fun");
 
     try {
@@ -151,12 +148,10 @@ export default {
     }
   },
 
-  // Keep the free Render API awake for the testnet demo.
   async scheduled(_event: unknown, env: Env): Promise<void> {
     try {
       await fetch(`${env.API_ORIGIN}/api/health`, { method: "GET" });
     } catch {
-      // The next scheduled run will retry.
     }
   },
 };

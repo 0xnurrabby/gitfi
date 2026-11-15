@@ -450,8 +450,6 @@ export function chartData(
   const buckets = new Map<number, ChartCandle>();
   let bucketWidth = windowMs ? bucketMs[range]! : rangeMs.ALL ? 86_400_000 : bucketMs[range]!;
   if (rows.length > 0 && rows.length <= 80) {
-    // Sparse market: keep every trade visible instead of collapsing it into
-    // a wide bucket. This is what makes a fresh buy visibly move the chart.
     bucketWidth = 1;
     interval = "1m";
   } else if (rows.length > 1) {

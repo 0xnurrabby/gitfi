@@ -124,7 +124,6 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
             try {
               listener(parsed);
             } catch {
-              // One bad listener should not break the stream.
             }
           }
         }
@@ -133,7 +132,6 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
             try {
               listener(parsed);
             } catch {
-              // ignore
             }
           }
         }

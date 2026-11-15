@@ -3,7 +3,6 @@ export interface ChartPoint {
   y: number;
 }
 
-/** Smooth cubic path through every point, without overshooting. */
 export function smoothPath(points: ChartPoint[]): string {
   if (!points.length) return "";
   if (points.length === 1) return `M ${points[0]!.x} ${points[0]!.y}`;

@@ -240,6 +240,5 @@ systemRouter.post(
   }),
 );
 
-// Keeps TypeScript aware that writeLimiter is intentionally available to future routes.
 void writeLimiter;
 void getSessionUser;

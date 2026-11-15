@@ -11,15 +11,12 @@ import { backfillDeeds, backfillAnchors } from "./chain.js";
 
 async function main(): Promise<void> {
   initDb();
-  // Sandbox login has been removed. Invalidate any pre-existing sandbox sessions
-  // so every browser must connect a real NEAR wallet.
   try {
     const removed = db
       .prepare("DELETE FROM sessions WHERE user_id IN (SELECT id FROM users WHERE is_sandbox = 1)")
       .run();
     if (Number(removed.changes) > 0) log(`cleared ${removed.changes} legacy sandbox session(s)`);
   } catch {
-    // Session cleanup must never block startup.
   }
   if (config.seedDemo) {
     await seedDemoData();

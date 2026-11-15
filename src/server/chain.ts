@@ -92,7 +92,6 @@ function rowToChainTx(row: ChainTxRow): ChainTx {
   };
 }
 
-// ----------------------------- Borsh envelope -----------------------------
 
 function u32le(value: number): Buffer {
   const out = Buffer.alloc(4);
@@ -162,7 +161,6 @@ function anchorEnvelope(input: {
   return { nonce: Array.from(nonce), issuedAt, signature: Array.from(signature) };
 }
 
-// ----------------------------- Credentials / client -----------------------------
 
 let provider: JsonRpcProvider | null = null;
 let account: Account | null = null;
@@ -252,7 +250,6 @@ function contractUrl(): string {
   return `${config.nearExplorerUrl.replace(/\/$/, "")}/accounts/${config.nearContractId}`;
 }
 
-// ----------------------------- Persistence -----------------------------
 
 function insertTx(input: {
   kind: string;
@@ -393,7 +390,6 @@ async function submitTx(id: string): Promise<ChainTx> {
   }
 }
 
-// ----------------------------- Public chain actions -----------------------------
 
 export interface DeedInput {
   repo: string;
@@ -631,7 +627,6 @@ export function waitForChainTx(id: string, timeoutMs = 20_000): Promise<ChainTx 
   });
 }
 
-// ----------------------------- Reads -----------------------------
 
 export function latestChainTx(kind: string, aggregate: string): ChainTx | null {
   const row = db
@@ -733,13 +728,7 @@ export async function chainStatus(): Promise<ChainStatus> {
   return base;
 }
 
-// ----------------------------- Startup work -----------------------------
 
-/**
- * Mint a Repo Deed for every market that predates the chain bridge. Demo
- * markets are minted escrowed: the oracle can release them to a verified owner
- * later without a private key being handed around.
- */
 export function backfillDeeds(): void {
   if (!chainEnabled()) return;
   const rows = db
@@ -774,11 +763,6 @@ export function backfillDeeds(): void {
   if (queued > 0) log(`queued ${queued} Repo Deed mint${queued === 1 ? "" : "s"} on NEAR ${config.nearNetwork}`);
 }
 
-/**
- * Anchor the newest receipt of each material type for every existing market.
- * New activity is anchored live; this only fills the gap for markets that
- * predate the chain bridge. Dedupe happens by receipt digest.
- */
 export function backfillAnchors(): void {
   if (!chainEnabled()) return;
   const tokens = db.prepare("SELECT id FROM tokens ORDER BY created_at ASC").all() as {

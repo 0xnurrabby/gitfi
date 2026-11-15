@@ -4,7 +4,7 @@ export const APP_DESCRIPTION =
   "GitFi turns public GitHub repositories into verified, tradeable utility tokens with developer royalties, live star momentum and holder yield.";
 
 export const GITHUB_RAW_HOST = "raw.githubusercontent.com";
-export const VIP_THRESHOLD_BPS = 5; // 0.05% of supply
+export const VIP_THRESHOLD_BPS = 5;
 export const DEFAULT_PAGE_SIZE = 24;
 
 export const STAR_HEALTH = {

@@ -49,7 +49,6 @@ export function formatCompact(value: number): string {
   return compact(value);
 }
 
-/** Micro-token amounts -> human token count. */
 export function formatTokens(micro: number | bigint, opts?: { compact?: boolean }): string {
   const value = Number(micro) / 1_000_000;
   if (opts?.compact || Math.abs(value) >= 1_000_000) return compact(value);

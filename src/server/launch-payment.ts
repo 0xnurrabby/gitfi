@@ -38,11 +38,6 @@ export function recordLaunchPayment(payment: VerifiedLaunchPayment, wallet: stri
   ).run(payment.txHash, wallet, payment.amountYocto, nowIso());
 }
 
-/**
- * Verifies that the launcher paid the fixed platform launch fee to the
- * configured platform fee address before a token/market can be created. The transaction must be final,
- * signed by the launching wallet, and addressed to the configured team account.
- */
 export async function verifyLaunchPayment(
   txHash: string,
   wallet: string,
